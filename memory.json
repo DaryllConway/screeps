@@ -1,0 +1,18 @@
+{
+  "creepType": {
+    "Worker": {
+      "maxCount": 5
+    },
+    "Builder": {
+      "maxCount": 3
+    },
+    "Scout": {
+      "maxCount": 1
+    }
+  },
+  "creeps": {
+  },
+  "spawns": [
+    "Spawn1"
+  ]
+}
