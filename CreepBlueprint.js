@@ -7,7 +7,6 @@ module.exports = (function () {
   function CreepBlueprint(name, type, bodies, factory) {
     this.name = name;
     this.type = type;
-    this.typereg = new RegExp(name, 'i');
     this.bodies = bodies;
     this.cost = utils.sumBodyParts(this.bodies);
     factory.keys.push(name.toUpperCase());
