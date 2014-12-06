@@ -116,10 +116,10 @@ module.exports = (function () {
   };
 
   Collection.prototype.asc = function (key) {
-    return this.sort(function (a, b) { if (a[key] > a[b]) { return 1; } else if (a[key] < b[key]) { return -1; } return 0; });
+    return this.sort(function (a, b) { if (a[key] > b[key]) { return 1; } else if (a[key] < b[key]) { return -1; } return 0; });
   };
   Collection.prototype.desc = function (key) {
-    return this.sort(function (a, b) { if (a[key] < a[b]) { return 1; } else if (a[key] > b[key]) { return -1; } return 0; });
+    return this.sort(function (a, b) { if (a[key] < b[key]) { return 1; } else if (a[key] > b[key]) { return -1; } return 0; });
   };
 
   Collection.prototype.at = function (index) {

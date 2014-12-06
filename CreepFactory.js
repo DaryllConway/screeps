@@ -6,7 +6,7 @@ module.exports = (function () {
 
   function CreepFactory() {
     this.keys = [];
-    this.WORKER  = new CreepBlueprint("Worker" , 1, [Game.MOVE, Game.MOVE, Game.MOVE, Game.CARRY, Game.WORK], this);
+    this.WORKER  = new CreepBlueprint("Worker" , 1, [Game.MOVE, Game.MOVE, Game.CARRY, Game.CARRY, Game.WORK], this);
     this.BUILDER = new CreepBlueprint("Builder", 2, [Game.MOVE, Game.CARRY, Game.CARRY, Game.WORK, Game.WORK], this);
     this.SCOUT   = new CreepBlueprint("Scout"  , 4, [Game.MOVE, Game.MOVE, Game.MOVE, Game.MOVE], this);
   }

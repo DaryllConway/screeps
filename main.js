@@ -1,6 +1,15 @@
 (function () {
   'use strict';
 
+  if (!('isRunning' in Memory)) {
+    // setup default memory if is empty
+    console.log('setup default memory');
+    var defaultMemory = require('memory');
+    Object.keys(defaultMemory).forEach(function (key) {
+      Memory[key] = defaultMemory[key];
+    });
+  }
+
   if (Memory.isRunning === false) {
     return;
   }

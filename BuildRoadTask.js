@@ -6,7 +6,7 @@ module.exports = (function () {
   var Look = require('Look');
 
   function BuildRoadTask() {
-    BuildRoadTask.__super__.constructor.call(this, 'buildRoad', 60);
+    BuildRoadTask.__super__.constructor.call(this, 'buildRoad', 20);
   }
 
   BuildRoadTask.__super__ = Task.prototype;
