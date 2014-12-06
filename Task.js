@@ -8,8 +8,8 @@ module.exports = (function () {
     if (typeof id !== 'string') {
       throw new Error('The id of the Task must be a string, actually ' + (typeof id));
     }
-    if (typeof delta !== 'number' || String(delta) === 'NaN' || delta < 32) {
-      throw new Error('Cannot set a Task with a delta < 32, actually ' + String(delta));
+    if (typeof delta !== 'number' || String(delta) === 'NaN') {
+      throw new Error('Cannot set a Task with implicite delta, actually ' + String(delta));
     }
     if (instancedTasks.indexOf(id) !== -1) {
       throw new Error('Cannot instanciate task with the same id, actually ' + String(id));
@@ -29,14 +29,14 @@ module.exports = (function () {
   Task.prototype.doTask = function doTask() {};
 
   Task.prototype.run = function run() {
-    var now = Date.now();
-    if (now > Storage.get(this.actionId) + Storage.get(this.deltaKey)) {
+    var delta = Storage.get(this.deltaKey);
+    if (delta === 0 || Game.time > Storage.get(this.actionId) + delta) {
       if (Storage.get('debugMode') === true) {
         console.log('task.run(' + this.actionId + ')');
       }
       // Run the task
       this.doTask();
-      Storage.set(this.actionId, now);
+      Storage.set(this.actionId, Game.time);
     }
   };
 
