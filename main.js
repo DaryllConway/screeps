@@ -1,9 +1,8 @@
-var K;
 (function () {
   'use strict';
 
   require('initializers')();
-  K = require('K');
+  var K = require('K');
   var collections = require('collections');
   var Actions = require('Actions');
   var CreepFactory = require('CreepFactory');

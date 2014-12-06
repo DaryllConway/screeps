@@ -1,5 +1,5 @@
 {
-  "creepType": {
+  "CreepBlueprint": {
     "Worker": {
       "maxCount": 5
     },
