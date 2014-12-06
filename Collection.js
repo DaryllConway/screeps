@@ -123,7 +123,7 @@ module.exports = (function () {
   };
 
   Collection.prototype.at = function (index) {
-    return this[index];
+    return this.children[index];
   }
 
   return Collection;
