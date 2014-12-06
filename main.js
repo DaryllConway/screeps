@@ -6,7 +6,7 @@ var K;
   K = require('K');
   var collections = require('collections');
   var Actions = require('Actions');
-  var CreepTypes = require('CreepTypes');
+  var CreepFactory = require('CreepFactory');
 
   function getFilterByType(type) {
     return function (value) {
@@ -14,8 +14,8 @@ var K;
     };
   }
 
-  K.workers  = K.creeps.filter(getFilterByType(CreepTypes.WORKER.type));
-  K.builders = K.creeps.filter(getFilterByType(CreepTypes.BUILDER.type));
+  K.workers  = K.creeps.filter(getFilterByType(CreepFactory.WORKER.type));
+  K.builders = K.creeps.filter(getFilterByType(CreepFactory.BUILDER.type));
 
   K.workers.setAction(Actions.harvest);
   K.builders.setAction(Actions.build);
@@ -23,6 +23,6 @@ var K;
   K.workers.work();
   K.builders.work();
 
-  CreepTypes.tryToFillAll();
+  CreepFactory.tryToFillAll();
 
 }).call(this);
