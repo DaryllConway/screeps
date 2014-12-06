@@ -4,10 +4,8 @@ module.exports = (function () {
   var Actions = {};
   var utils = require('utils');
   var Collection = require('Collection');
-  var K = require('K');
 
   Actions.harvest = function harvest(creep, index) {
-    'use strict';
     var nearestSpawn, site, sources, spawns;
     if (creep.spawning) return;
 
@@ -33,7 +31,6 @@ module.exports = (function () {
     creep.harvest(site);
   };
   Actions.build = function build(creep, index) {
-    'use strict';
     var sites, site, spawns, nearestSpawn;
     if (creep.spawning) {
       return;

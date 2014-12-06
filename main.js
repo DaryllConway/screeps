@@ -1,37 +1,34 @@
 (function () {
   'use strict';
 
-  require('initializers')();
-  var K = require('K');
-  var collections = require('collections');
-  var Actions = require('Actions');
-  var CreepFactory = require('CreepFactory');
-
-  var TaskManager = require('TaskManager');
-  var BuildRoadTask = require('BuildRoadTask');
-  var SpawnCreepTask = require('SpawnCreepTask');
-
-  function getFilterByType(type) {
-    return function (value) {
-      return value && value.memory.type === type;
-    };
+  if (Memory.isRunning === false) {
+    return;
   }
 
-  K.workers  = K.creeps.filter(getFilterByType(CreepFactory.WORKER.type));
-  K.builders = K.creeps.filter(getFilterByType(CreepFactory.BUILDER.type));
+  try {
 
-  K.workers.setAction(Actions.harvest);
-  K.builders.setAction(Actions.build);
+    var K = require('K');
 
-  K.workers.work();
-  K.builders.work();
+    var TaskManager = require('TaskManager');
+    var SetupGlobalObjectTask = require('SetupGlobalObjectTask');
+    var BuildRoadTask = require('BuildRoadTask');
+    var SpawnCreepTask = require('SpawnCreepTask');
 
-  var tasks = new TaskManager();
-  tasks.add(new BuildRoadTask());
-  tasks.add(new SpawnCreepTask());
+    var tasks = new TaskManager();
+    tasks.add(new SetupGlobalObjectTask());
+    tasks.add(new BuildRoadTask());
+    tasks.add(new SpawnCreepTask());
 
-  tasks.runTasks();
+    tasks.runTasks();
 
-  //CreepFactory.tryToFillAll();
+    K.workers.work();
+    K.builders.work();
+
+  } catch (err) {
+    if (Memory.debugMode === true) {
+      Memory.isRunning = false;
+    }
+    throw err;
+  }
 
 }).call(this);

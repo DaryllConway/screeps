@@ -2,7 +2,7 @@ module.exports = (function () {
   'use strict';
 
   function getDefaultSpawn() {
-    return Game.spawns[Memory.spawns.first()];
+    return Game.spawns[Memory.spawns[0]];
   }
   function sumBodyParts(bodyparts) {
     var sum = 0;

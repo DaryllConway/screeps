@@ -1,13 +1,14 @@
 var utils = require('utils');
 
 var defaultMemory = {
-  'CreepBlueprint' = {
+  'CreepBlueprint': {
     'Worker' : { 'maxCount': 5 },
     'Builder': { 'maxCount': 3 },
     'Scout'  : { 'maxCount': 0 }
   },
-  'creeps': {}
-  'debugMode': false
+  'creeps': {},
+  'debugMode': false,
+  'isRunning': true
 };
 defaultMemory['spawns'] = utils.valuesOf(Game.spawns).map(function (spawn) {
   return spawn.name;
