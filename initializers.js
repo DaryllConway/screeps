@@ -1,13 +1,13 @@
 var utils = require('utils');
 
 function setupDefaultMemory() {
-  Memory.creepType = {
+  Memory.CreepBlueprint = {
     Worker : { maxCount: 5 },
     Builder: { maxCount: 3 },
     Scout  : { maxCount: 0 }
   };
   Memory.lastPainfulActions = 0;
-  Memory.painfulActionDelta = 2 * 60 * 1000;
+  Memory.painfulActionDelta = 0.5 * 60 * 1000;
   Memory.creeps = {};
   Memory.spawns = utils.valuesOf(Game.spawns).map(function (spawn) {
     return spawn.name;
@@ -38,11 +38,9 @@ function createRoad(from, to) {
     return false;
   }
   var path = from.pos.findPathTo(to, { ignoreCreeps: true, ignoreDestructibleStructures: true, maxOps: 200 });
-  console.log('find path with '+ path.length + ' steps');
   path.forEach(function (pos) {
     var look = room.lookAt(pos);
     if (!lookContains(look, Game.STRUCTURE_ROAD) && isBuildable(look)) {
-      console.log(String(pos.x) + ', ' + String(pos.y) + ' not contains a road');
       room.createConstructionSite(pos, Game.STRUCTURE_ROAD);
       isBuilding = true;
     }
@@ -94,7 +92,6 @@ function createRoads() {
 }
 
 function createConstructionSites() {
-  console.log('createConstructionSites');
   createRoads();
 }
 
@@ -106,35 +103,20 @@ module.exports = function () {
     Array.prototype.first = function () { return this[0]; };
     Array.prototype.last = function () { return this[this.length - 1]; };
   }
-  if (!Memory.creepType) setupDefaultMemory();
+  if (!Memory.CreepBlueprint) setupDefaultMemory();
 
   K.creeps = new collections.CreepCollection();
   K.creeps.children = utils.valuesOf(Game.creeps);
 
-
-  function getFilterSpawnFilled() {
-    return function (spawn) {
-      return spawn.energy === spawn.energyCapacity;
-    }
-  }
-  function getFilterSpawnNotFilled() {
-    return function (spawn) {
-      return spawn.energy < spawn.energyCapacity;
-    }
-  }
-
   K.rooms = new collections.Collection();
   K.hostiles = new collections.CreepCollection();
-  K.fullSpawn = new collections.Collection();
-  K.emptySpawn = new collections.Collection();
+  K.spawns = new collections.Collection();
   // Scan rooms where creeps are to detect all hostiles
   K.creeps.forEach(function (creep) {
     if (K.rooms.indexOf(creep.room) === -1) {
       K.rooms.add(creep.room);
       var hostiles = creep.room.find(Game.HOSTILE_CREEPS);
-      var spawns = new collections.Collection(creep.room.find(Game.MY_SPAWNS));
-      K.fullSpawn.addAll(spawns.filter(getFilterSpawnFilled()));
-      K.emptySpawn.addAll(spawns.filter(getFilterSpawnNotFilled()));
+      K.spawns.addAll(creep.room.find(Game.MY_SPAWNS));
       creep.room.hostileCount = hostiles.length;
       K.hostiles.addAll(hostiles);
     }
