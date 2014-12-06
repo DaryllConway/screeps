@@ -122,10 +122,10 @@ module.exports = function () {
     }
   });
 
-  if (Date.now() - Memory.lastPainfulActions > Memory.painfulActionDelta) {
-    createConstructionSites();
-    Memory.lastPainfulActions = Date.now();
-  }
+  // if (Date.now() - Memory.lastPainfulActions > Memory.painfulActionDelta) {
+  //   createConstructionSites();
+  //   Memory.lastPainfulActions = Date.now();
+  // }
 
   return {
     initialized: true

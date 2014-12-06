@@ -7,6 +7,10 @@
   var Actions = require('Actions');
   var CreepFactory = require('CreepFactory');
 
+  var TaskManager = require('TaskManager');
+  var BuildRoadTask = require('BuildRoadTask');
+  var SpawnCreepTask = require('SpawnCreepTask');
+
   function getFilterByType(type) {
     return function (value) {
       return value && value.memory.type === type;
@@ -22,6 +26,12 @@
   K.workers.work();
   K.builders.work();
 
-  CreepFactory.tryToFillAll();
+  var tasks = new TaskManager();
+  tasks.add(new BuildRoadTask());
+  tasks.add(new SpawnCreepTask());
+
+  tasks.runTasks();
+
+  //CreepFactory.tryToFillAll();
 
 }).call(this);
