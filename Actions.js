@@ -9,9 +9,7 @@ module.exports = (function () {
   Actions.harvest = function harvest(creep, index) {
     'use strict';
     var nearestSpawn, site, sources, spawns;
-    if (creep.spawning) {
-      return;
-    }
+    if (creep.spawning) return;
 
     sources = creep.room.find(Game.SOURCES);
     site = sources[index % sources.length];
@@ -50,11 +48,12 @@ module.exports = (function () {
         nearestSpawn = spawns.filter(function (spawn) {
           return spawn.energy > spawn.energyCapacity / 3;
         }).findNearest(creep.pos);
+
         if (!nearestSpawn) {
           if (Game.flags.BuilderPoint) creep.moveTo(Game.flags.BuilderPoint);
           return;
         }
-        if (nearestSpawn) {
+        else {
           if (!site) {
             if (creep.energy) {
               creep.moveTo(nearestSpawn);
