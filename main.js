@@ -1,24 +1,27 @@
+var K;
 (function () {
   'use strict';
 
-  require('intializers');
+  require('initializers')();
+  K = require('K');
+  var collections = require('collections');
   var Actions = require('Actions');
   var CreepTypes = require('CreepTypes');
 
   function getFilterByType(type) {
     return function (value) {
-      return value && value.type === type;
+      return value && value.memory.type === type;
     };
   }
 
-  var workers = Game.collections.creep.filter(getFilterByType(CreepTypes.WORKER.type));
-  var builers = Game.collections.creep.filter(getFilterByType(CreepTypes.BUILDER.type));
+  K.workers  = K.creeps.filter(getFilterByType(CreepTypes.WORKER.type));
+  K.builders = K.creeps.filter(getFilterByType(CreepTypes.BUILDER.type));
 
-  workers.setAction(Actions.harvest);
-  builders.setAction(Actions.build);
+  K.workers.setAction(Actions.harvest);
+  K.builders.setAction(Actions.build);
 
-  workers.work()
-  builders.work();
+  K.workers.work();
+  K.builders.work();
 
   CreepTypes.tryToFillAll();
 

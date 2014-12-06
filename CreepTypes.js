@@ -1,8 +1,8 @@
-var utils = require('utils');
-var CreepCollection = require('CreepCollection');
-
 module.exports = (function () {
   'use strict';
+
+  var utils = require('utils');
+  var CreepCollection = require('CreepCollection');
 
   function CreepType(name, type, bodies, parent) {
     this.name = name;
@@ -33,8 +33,8 @@ module.exports = (function () {
     var out = new CreepCollection(), creep, maxCount = this.getMaxCount();
     for (var name in Game.creeps) {
       creep = Game.creeps[name];
-      if (creep && out.length < maxCount && creep.memory.type === this.type) {
-        out.push(creep);
+      if (creep && out.size() < maxCount && creep.memory.type === this.type) {
+        out.add(creep);
       }
     }
     return out;
@@ -62,7 +62,7 @@ module.exports = (function () {
   function CreepTypes() {
     this.keys = [];
     this.WORKER  = new CreepType("Worker" , 1, [Game.MOVE, Game.MOVE, Game.MOVE, Game.CARRY, Game.WORK], this);
-    this.BUILDER = new CreepType("Builder", 2, [Game.MOVE, Game.CARRY, Game.WORK, Game.WORK, Game.WORK], this);
+    this.BUILDER = new CreepType("Builder", 2, [Game.MOVE, Game.CARRY, Game.CARRY, Game.WORK, Game.WORK], this);
     this.SCOUT   = new CreepType("Scout"  , 4, [Game.MOVE, Game.MOVE, Game.MOVE, Game.MOVE], this);
   }
 
@@ -73,7 +73,7 @@ module.exports = (function () {
       if (spawn.spawning) {
         return;
       }
-      if (this[key].getChildren().length < this[key].getMaxCount()) {
+      if (this[key].getChildren().size() < this[key].getMaxCount()) {
         return this[key].create();
       }
     }
@@ -81,6 +81,3 @@ module.exports = (function () {
 
   return new CreepTypes();
 })();
-
-
-

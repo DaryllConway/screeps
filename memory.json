@@ -10,8 +10,7 @@
       "maxCount": 1
     }
   },
-  "creeps": {
-  },
+  "creeps": {},
   "spawns": [
     "Spawn1"
   ]
