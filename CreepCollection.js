@@ -26,8 +26,20 @@ module.exports = (function () {
     return this.forEach(this.action.callback, this.action.context);
   };
 
-  Collection.prototype.squadIt = function () {
-
+  CreepCollection.prototype.squadIt = function (squadSize) {
+    var
+      out = new Collection(),
+      currentSquadIndex = 0;
+    this.forEach(function (creep, index) {
+      if (!out.at(currentSquadIndex)) {
+        out.add(new CreepCollection());
+      }
+      out.at(currentSquadIndex).add(creep);
+      if (out.at(currentSquadIndex).size() === squadSize) {
+        currentSquadIndex += 1;
+      }
+    });
+    return out;
   };
 
   CreepCollection.prototype.assignAll = function (object) {
