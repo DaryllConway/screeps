@@ -18,34 +18,22 @@ module.exports = (function () {
 
   SetupGlobalObjectTask.prototype.doTask = function doTask() {
 
-    // Main creep collection
+
+    K.rooms = new collections.Collection();
     K.creeps = new collections.CreepCollection();
-    K.creeps.children = utils.valuesOf(Game.creeps);
+
+    Object.keys(Game.creeps).forEach(function (key) {
+      var creep = Game.creeps[key];
+      K.creeps.add(creep);
+      K.rooms.add(creep.room);
+    });
 
     // setup typed creep collections
     K.workers  = K.creeps.filter(function (value) { return value && value.memory.type === CreepFactory.WORKER.type });
     K.builders = K.creeps.filter(function (value) { return value && value.memory.type === CreepFactory.BUILDER.type });
 
-    K.workers.setAction(Actions.harvest);
-    K.builders.setAction(Actions.build);
-
-    // scan visible entities
-    K.rooms = new collections.Collection();
-    K.hostiles = new collections.CreepCollection();
-    K.spawns = new collections.Collection();
-
-    K.creeps.forEach(function (creep) {
-      if (K.rooms.indexOf(creep.room) === -1) {
-        // visible room
-        K.rooms.add(creep.room);
-        // visible hostiles
-        var hostiles = creep.room.find(Game.HOSTILE_CREEPS);
-        creep.room.hostileCount = hostiles.length;
-        K.hostiles.addAll(hostiles);
-        // visible spawns
-        K.spawns.addAll(creep.room.find(Game.MY_SPAWNS));
-      }
-    });
+    K.workers .assignAll({ 'behavior': Actions.harvest });
+    K.builders.assignAll({ 'behavior': Actions.build   });
   };
 
   return SetupGlobalObjectTask;
