@@ -3,7 +3,7 @@ module.exports = (function () {
 
   Look.isBuildable = function isBuildable(look) {
     for (var index = 0; index < look.length; index++) {
-      if (/source|structure|exit/.test(look[index].type) || /wall/.test(look[index].terrain)) {
+      if (/source|exit/.test(look[index].type) || /wall/.test(look[index].terrain) || !(look[index].type === 'structure' && look[index].structureType === Game.STRUCTURE_RAMPART)) {
         return false;
       }
     }

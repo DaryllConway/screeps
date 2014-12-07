@@ -49,11 +49,7 @@ module.exports = (function () {
     }
     var path = from.pos.findPathTo(to, { ignoreCreeps: true, ignoreDestructibleStructures: true, maxOps: 200 });
     path.forEach(function (pos) {
-      var look = room.lookAt(pos);
-      if (Look.isBuildable(look) && !Look.containsStructureType(look, Game.STRUCTURE_ROAD)) {
-        room.createConstructionSite(pos, Game.STRUCTURE_ROAD);
-        isBuilding = true;
-      }
+      if (room.createConstructionSite(pos, Game.STRUCTURE_ROAD) === Game.OK) isBuilding = true;
     });
     return isBuilding;
   };
