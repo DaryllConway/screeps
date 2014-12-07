@@ -2,75 +2,128 @@ module.exports = (function () {
   'use strict';
 
   var Actions = {};
-  var utils = require('utils');
-  var Collection = require('Collection');
+  var RoomAnalyzer = require('RoomAnalyzer');
+  var Storage = require('StorageElement');
 
-  Actions.harvest = function harvest(creep, index) {
-    var nearestSpawn, site, sources, spawns;
-    if (creep.spawning) return;
-
-    sources = creep.room.find(Game.SOURCES);
-    site = sources[index % sources.length];
-
-    spawns = new Collection(creep.room.find(Game.MY_SPAWNS));
-    nearestSpawn = spawns.filter(function (spawn) {
-      return spawn.energy < spawn.energyCapacity;
-    }).findNearest(creep.pos);
-    if (!site || !nearestSpawn) {
-      creep.moveTo(utils.getDefaultSpawn());
-      return;
-    }
-
-    if (creep.energy === creep.energyCapacity) {
-      creep.moveTo(nearestSpawn);
-      creep.transferEnergy(nearestSpawn);
-      return;
-    }
-
-    creep.moveTo(site);
-    creep.harvest(site);
-  };
-  Actions.build = function build(creep, index) {
-    var sites, site, spawns, nearestSpawn;
-    if (creep.spawning) {
-      return;
-    }
-
-    if (!creep.target || creep.energy === 0) {
-      sites = creep.room.find(Game.CONSTRUCTION_SITES);
-      site  = sites[index % sites.length];
-
-      if (!site || creep.energy === 0) {
-        spawns = new Collection(creep.room.find(Game.MY_SPAWNS));
-        nearestSpawn = spawns.filter(function (spawn) {
-          return spawn.energy > spawn.energyCapacity / 3;
-        }).findNearest(creep.pos);
-
-        if (!nearestSpawn) {
-          if (Game.flags.BuilderPoint) creep.moveTo(Game.flags.BuilderPoint);
-          return;
-        }
-        else {
-          if (!site) {
-            if (creep.energy) {
-              creep.moveTo(nearestSpawn);
-              creep.transferEnergy(nearestSpawn);
-            } else if (Game.flags.BuilderPoint) {
-              creep.moveTo(Game.flags.BuilderPoint);
-            }
-          }
-          else if (creep.energy === 0 && nearestSpawn.energy >= creep.energyCapacity) {
-            creep.moveTo(nearestSpawn);
-            nearestSpawn.transferEnergy(creep);
-          }
-          return;
-        }
-      } else {
-        creep.target = site;
+  function getFirstFilledCollection(/* collection1, collection2, collection2, ... */) {
+    for (var index in arguments) {
+      if (arguments[index]) {
+        if (arguments[index].size()) return arguments[index];
       }
     }
-    creep.moveTo(creep.target);
-    creep.build(creep.target);
+  }
+
+  function setTargetTo(creep, type, target) {
+    if (target) {
+      Storage.get('assignations.' + type + '.' + target.id).push(creep.name);
+      creep.memory.target = target.id;
+    }
+    creep.target = target;
+  }
+
+  function getNextTargetIn(storage) {
+    var
+      minKey, minValue = Number.MAX_VALUE,
+      keys = storage.keys(),
+      nextAssignation = null;
+    if (keys.length) {
+      keys.forEach(function (key) {
+        if (storage.get(key).length < minValue) {
+          minValue = storage.get(key).length;
+          minKey = key;
+        }
+      });
+      nextAssignation = Game.getObjectById(minKey);
+    }
+    return nextAssignation;
+  }
+
+  function getTargetOf(creep, storage) {
+    var
+      storageKeys = storage.keys(),
+      resultIndex, result;
+    if (creep.memory.target && (result = Game.getObjectById(creep.memory.target))) {
+      return result;
+    }
+
+    for (var index = 0, len = storageKeys.length; index < len; index++) {
+      if ((resultIndex = storage.findInArray(storageKeys[index], creep.name)) > -1) {
+        creep.memory.target = storageKeys[index];
+        return Game.getObjectById(storageKeys[index]);
+      }
+    }
+    return null;
+  }
+
+  Actions.harvest = function harvest() {
+    var nearestEnergyStorage, energyStorages, energyStorageAnalyze, analyzer,
+      harvesterStorage = Storage.get('assignations.harvester');
+
+    if (this.spawning) return;
+
+    this.target = getTargetOf(this, harvesterStorage);
+
+    if (!this.target || !Game.getObjectById(this.target.id)) {
+      // if the target is no longer available
+      setTargetTo(this, 'harvester', getNextTargetIn(harvesterStorage));
+    }
+
+    if (this.energy === this.energyCapacity) {
+      // find the nearest filled energy storage to the target or me
+      // and transferEnergy from me
+      // if no energyStorage next to me, wait
+      analyzer = RoomAnalyzer.getRoom(this.room.name)
+      energyStorageAnalyze = analyzer.analyze(RoomAnalyzer.TYPE_SPAWNS).energyStorages;
+
+      if (energyStorages = getFirstFilledCollection(energyStorageAnalyze.empty, energyStorageAnalyze.nearEmpty, energyStorageAnalyze.others, energyStorageAnalyze.nearFull)) {
+        nearestEnergyStorage = energyStorages.findNearest(this.target ? this.target.pos : this.pos);
+      }
+
+      if (!nearestEnergyStorage) return;
+      this.moveTo(nearestEnergyStorage);
+      this.transferEnergy(nearestEnergyStorage);
+      return;
+    }
+
+    this.moveTo(this.target);
+    this.harvest(this.target);
+  };
+
+  Actions.build = function build() {
+    var analyzer, nearestEnergyStorage, energyStorages, energyStorageAnalyze,
+      builderStorage = Storage.get('assignations.builder');
+
+    if (this.spawning) return;
+
+    this.target = getTargetOf(this, builderStorage);
+
+    if (!this.target || !Game.getObjectById(this.target.id)) {
+      // if the target is no longer available
+      setTargetTo(this, 'builder', getNextTargetIn(builderStorage));
+    }
+
+    if (this.energy === 0) {
+      // find the nearest filled energy storage to the target or me
+      // and transferEnergy to me
+      // if no energyStorage next to me, wait
+      analyzer = RoomAnalyzer.getRoom(this.room.name)
+      energyStorageAnalyze = analyzer.analyze(RoomAnalyzer.TYPE_SPAWNS).energyStorages;
+
+      if (energyStorages = getFirstFilledCollection(energyStorageAnalyze.filled.merge(energyStorageAnalyze.nearFull), energyStorageAnalyze.others)) {
+        nearestEnergyStorage = energyStorages.findNearest(this.target ? this.target.pos : this.pos);
+      }
+
+      if (!nearestEnergyStorage) return;
+
+      this.moveTo(nearestEnergyStorage);
+      nearestEnergyStorage.transferEnergy(this);
+      return;
+    }
+
+    if (!this.target) return;
+    this.moveTo(this.target);
+    this.build(this.target);
+
   };
 
   return Actions;
