@@ -17,6 +17,7 @@ module.exports = (function () {
     if (target) {
       Storage.get('assignations.' + type + '.' + target.id).push(creep.name);
       creep.memory.target = target.id;
+      creep.memory.nextDirection = null;
     }
     creep.target = target;
   }
@@ -56,7 +57,9 @@ module.exports = (function () {
   }
 
   Actions.harvest = function harvest() {
-    var nearestEnergyStorage, energyStorages, energyStorageAnalyze, analyzer,
+    var nearestEnergyStorage, energyStorages,
+      energyStorageAnalyze, analyzer, nextEnergyStorage,
+      transferingResult,
       harvesterStorage = Storage.get('assignations.harvester');
 
     if (this.spawning) return;
@@ -69,19 +72,26 @@ module.exports = (function () {
     }
 
     if (this.energy === this.energyCapacity) {
-      // find the nearest filled energy storage to the target or me
-      // and transferEnergy from me
-      // if no energyStorage next to me, wait
-      analyzer = RoomAnalyzer.getRoom(this.room.name)
-      energyStorageAnalyze = analyzer.analyze(RoomAnalyzer.TYPE_SPAWNS).energyStorages;
+      if (!this.memory.nextEnergyStorageId) {
+        // find the nearest filled energy storage to the target or me
+        // and transferEnergy from me
+        // if no energyStorage next to me, wait
+        analyzer = RoomAnalyzer.getRoom(this.room.name)
+        energyStorageAnalyze = analyzer.analyze(RoomAnalyzer.TYPE_SPAWNS).energyStorages;
 
-      if (energyStorages = getFirstFilledCollection(energyStorageAnalyze.empty, energyStorageAnalyze.nearEmpty, energyStorageAnalyze.others, energyStorageAnalyze.nearFull)) {
-        nearestEnergyStorage = energyStorages.findNearest(this.target ? this.target.pos : this.pos);
+        if (energyStorages = getFirstFilledCollection(energyStorageAnalyze.empty, energyStorageAnalyze.nearEmpty, energyStorageAnalyze.others, energyStorageAnalyze.nearFull)) {
+          nearestEnergyStorage = energyStorages.findNearest(this.target ? this.target.pos : this.pos);
+        }
+        if (!nearestEnergyStorage) return;
+        this.memory.nextEnergyStorageId = nearestEnergyStorage.id;
       }
+      nextEnergyStorage = Game.getObjectById(this.memory.nextEnergyStorageId);
 
-      if (!nearestEnergyStorage) return;
-      this.moveTo(nearestEnergyStorage);
-      this.transferEnergy(nearestEnergyStorage);
+      this.moveTo(nextEnergyStorage);
+      transferingResult = this.transferEnergy(nextEnergyStorage);
+      if (transferingResult === Game.ERR_FULL || this.energy === 0) {
+        this.memory.nextEnergyStorageId = null;
+      }
       return;
     }
 
@@ -91,7 +101,8 @@ module.exports = (function () {
 
   Actions.build = function build() {
     var analyzer, nearestEnergyStorage, energyStorages, energyStorageAnalyze,
-      builderStorage = Storage.get('assignations.builder');
+      actionResult,
+      builderStorage = Storage.get('assignations.builder'), nextEnergyStorage;
 
     if (this.spawning) return;
 
@@ -103,26 +114,75 @@ module.exports = (function () {
     }
 
     if (this.energy === 0) {
-      // find the nearest filled energy storage to the target or me
-      // and transferEnergy to me
-      // if no energyStorage next to me, wait
-      analyzer = RoomAnalyzer.getRoom(this.room.name)
-      energyStorageAnalyze = analyzer.analyze(RoomAnalyzer.TYPE_SPAWNS).energyStorages;
+      if (!this.memory.nextEnergyStorageId) {
+        // find the nearest filled energy storage to the target or me
+        // and transferEnergy to me
+        // if no energyStorage next to me, wait
+        analyzer = RoomAnalyzer.getRoom(this.room.name)
+        energyStorageAnalyze = analyzer.analyze(RoomAnalyzer.TYPE_SPAWNS).energyStorages;
 
-      if (energyStorages = getFirstFilledCollection(energyStorageAnalyze.filled.merge(energyStorageAnalyze.nearFull), energyStorageAnalyze.others)) {
-        nearestEnergyStorage = energyStorages.findNearest(this.target ? this.target.pos : this.pos);
+        if (energyStorages = getFirstFilledCollection(energyStorageAnalyze.filled.merge(energyStorageAnalyze.nearFull), energyStorageAnalyze.others)) {
+          nearestEnergyStorage = energyStorages.findNearest(this.target ? this.target.pos : this.pos);
+        }
+
+        if (!nearestEnergyStorage) return;
+        this.memory.nextDirection = null;
+        this.memory.nextEnergyStorageId = nearestEnergyStorage.id;
       }
+      nextEnergyStorage = Game.getObjectById(this.memory.nextEnergyStorageId);
 
-      if (!nearestEnergyStorage) return;
-
-      this.moveTo(nearestEnergyStorage);
-      nearestEnergyStorage.transferEnergy(this);
+      if (this.pos.inRangeTo(nextEnergyStorage.pos, 1)) {
+        actionResult = nextEnergyStorage.transferEnergy(this);
+        if (actionResult !== Game.OK) {
+          console.log('errTransfering(' + actionResult + ')');
+        }
+      } else {
+        // move
+        if (!this.memory.nextDirection) {
+          this.memory.nextDirection = this.pos.findPathTo(nextEnergyStorage.pos, { maxOps: 200 })
+            .map(function (path) { return path.direction; });
+        }
+        if (this.fatigue === 0 && this.memory.nextDirection.length) {
+          actionResult = this.move(this.memory.nextDirection[0]);
+          if (actionResult === Game.OK) {
+            this.memory.nextDirection.shift();
+          } else {
+            console.log('errMoving(' + actionResult + ' to energy storage)');
+          }
+          if (!this.memory.nextDirection.length) {
+            this.memory.nextDirection = null;
+          }
+        }
+      }
+      if (this.energy === this.energyCapacity) this.memory.nextEnergyStorageId = null;
       return;
     }
 
     if (!this.target) return;
-    this.moveTo(this.target);
-    this.build(this.target);
+    if (this.pos.inRangeTo(this.target.pos, 1)) {
+      // build
+      actionResult = this.build(this.target);
+      if (actionResult !== Game.OK) {
+        console.log('errBuilding(' + actionResult + ')');
+      }
+    } else {
+      // move
+      if (!this.memory.nextDirection) {
+        this.memory.nextDirection = this.pos.findPathTo(this.target.pos, { maxOps: 200 })
+          .map(function (path) { return path.direction; });
+      }
+      if (this.fatigue === 0 && this.memory.nextDirection.length) {
+        actionResult = this.move(this.memory.nextDirection[0]);
+        if (actionResult === Game.OK) {
+          this.memory.nextDirection.shift();
+        } else {
+          console.log('errMoving(' + actionResult + ')');
+        }
+        if (!this.memory.nextDirection.length) {
+          this.memory.nextDirection = null;
+        }
+      }
+    }
 
   };
 
