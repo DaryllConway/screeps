@@ -10,20 +10,15 @@ module.exports = (function () {
   CreepCollection.prototype = Object.create(CreepCollection.__super__);
   CreepCollection.prototype.constructor = CreepCollection;
 
-  CreepCollection.prototype.setAction = function (callback, context) {
-    if (typeof callback !== 'function') {
-      throw new Error('Collection::setAction Argument is not a function');
-    }
-    this.action = { 'callback': callback, 'context': context };
-  };
-
   CreepCollection.prototype.genocide = function () {
     this.forEach(function (creep) { creep.suicide(); });
     this.clear();
   };
 
   CreepCollection.prototype.work = function () {
-    return this.forEach(this.action.callback, this.action.context);
+    return this.forEach(function (creep) {
+      if (typeof creep.behavior === 'function') creep.behavior();
+    });
   };
 
   CreepCollection.prototype.squadIt = function (squadSize) {

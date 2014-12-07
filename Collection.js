@@ -75,6 +75,15 @@ module.exports = (function () {
     return out;
   };
 
+  Collection.prototype.find = function (callback, context) {
+    var index = -1, len = this.children.length;
+    while (++index < len) {
+      if (callback.call(context || this.children[index], this.children[index], index, this)) {
+        return this.children[index];
+      }
+    }
+  };
+
   Collection.prototype.size = function () {
     return this.children.length;
   };
@@ -124,7 +133,11 @@ module.exports = (function () {
 
   Collection.prototype.at = function (index) {
     return this.children[index];
-  }
+  };
+
+  Collection.prototype.merge = function (other) {
+    return new Collection(this.children.slice(0).concat(other instanceof Collection ? other.children : other));
+  };
 
   return Collection;
 })();
