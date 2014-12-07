@@ -19,12 +19,14 @@
     var K = require('K');
 
     var TaskManager = require('TaskManager');
+    var SanitizeMemoryTask = require('SanitizeMemoryTask');
     var SetupGlobalObjectTask = require('SetupGlobalObjectTask');
     var BuildRoadTask = require('BuildRoadTask');
     var SpawnCreepTask = require('SpawnCreepTask');
 
     var tasks = new TaskManager();
     tasks.add(new SetupGlobalObjectTask());
+    tasks.add(new SanitizeMemoryTask());
     tasks.add(new BuildRoadTask());
     tasks.add(new SpawnCreepTask());
 

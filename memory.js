@@ -1,6 +1,10 @@
 var utils = require('utils');
 
 var defaultMemory = {
+  'assignations': {
+    'harvester': {},
+    'builder': {}
+  },
   'CreepBlueprint': {
     'Worker' : { 'maxCount': 5 },
     'Builder': { 'maxCount': 3 },
