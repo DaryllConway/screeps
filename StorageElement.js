@@ -11,7 +11,7 @@ module.exports = (function () {
 
   StorageElement.prototype.constructor = StorageElement;
 
-  StorageElement.prototype.get = function(key) {
+  StorageElement.prototype.get = function get(key) {
     var keys = key.split('.');
     var value = this.object;
     var index = -1;
