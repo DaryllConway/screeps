@@ -14,10 +14,10 @@ A Task is a code that will be run on every n tick.
 var Task = require('Task');
 
 function MyTask() {
-  MyTask.\_\_super\_\_.constructor.call(this, 'set a unique id here', 4)
+  MyTask.__super__.constructor.call(this, 'set a unique id here', 4)
   // this task will be run every 4 ticks
 }
-MyTask.\_\_super\_\_ = Task.prototype;
+MyTask.__super__ = Task.prototype;
 MyTask.prototype = Object.create(MyTask.\_\_super\_\_);
 MyTask.constructor = MyTask;
 
