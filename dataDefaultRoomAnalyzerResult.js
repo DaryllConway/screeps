@@ -8,7 +8,8 @@ module.exports = (function () {
   return function () {
     return {
       spawn: {
-        free: new Collection()
+        free: new Collection(),
+        count: 0
       },
       energyStorages: {
         filled: new Collection(),

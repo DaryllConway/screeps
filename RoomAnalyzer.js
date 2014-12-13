@@ -170,9 +170,8 @@ module.exports = (function () {
 
   RoomAnalyzer.prototype.analyzeSpawnInformationAbout = function analyzeSpawnInformationAbout(spawn, options) {
     options = options || this.options;
-    if (!spawn.spawning) {
-      this.result.spawn.free.add(spawn);
-    }
+    if (!spawn.spawning) this.result.spawn.free.add(spawn);
+    this.result.spawn.count += 1;
   };
 
   RoomAnalyzer.prototype.analyzeConstructionSitesInformationAbout = function analyzeConstructionSitesInformationAbout(site, options) {
@@ -234,6 +233,7 @@ module.exports = (function () {
 
   RoomAnalyzer.rooms = {};
   RoomAnalyzer.getRoom = function getRoom(roomName) {
+    if (roomName.name) roomName = roomName.name;
     if (!RoomAnalyzer.rooms[roomName]) {
       RoomAnalyzer.rooms[roomName] = new RoomAnalyzer(roomName);
     }

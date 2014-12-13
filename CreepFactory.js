@@ -3,6 +3,7 @@ module.exports = (function () {
 
   var CreepBlueprint = require('CreepBlueprint');
   var K = require('K');
+  var RoomAnalyzer = require('RoomAnalyzer');
 
   function CreepFactory() {
     this.keys = ['WORKER', 'BUILDER'];
@@ -15,9 +16,9 @@ module.exports = (function () {
   }
 
   CreepFactory.prototype.spawnWorkerInto = function spawnWorkerInto(spawn) {
-    var sources = spawn.room.find(Game.SOURCES);
-    if (this.WORKER.getChildrenInRoom(spawn.room).size() < sources.length * this.WORKER.getMaxCount()) {
-      console.log('spawn worker');
+    var analysis = RoomAnalyzer.getRoom(spawn.room).analyze(RoomAnalyzer.TYPE_SPAWNS | RoomAnalyzer.TYPE_SOURCES);
+    if (this.WORKER.getChildrenInRoom(spawn.room).size() < analysis.energySources.count * this.WORKER.getMaxCount() * analysis.spawn.count) {
+      if (Memory.debugMode) console.log('spawn worker');
       this.WORKER.create(spawn);
       return true;
     }
@@ -26,6 +27,7 @@ module.exports = (function () {
 
   CreepFactory.prototype.spawnBuilderInto = function spawnBuilderInto(spawn) {
     if (this.BUILDER.getChildrenInRoom(spawn.room).size() < this.BUILDER.getMaxCount()) {
+      if (Memory.debugMode) console.log('spawn builder');
       this.BUILDER.create(spawn);
       return true;
     }
