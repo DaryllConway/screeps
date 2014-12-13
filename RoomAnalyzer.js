@@ -1,9 +1,6 @@
 module.exports = (function () {
   'use strict';
 
-  var Collection = require('Collection');
-  var CreepCollection = require('CreepCollection');
-
   function RoomAnalyzer(roomName, options) {
     this.roomName = roomName;
     this.room = Game.getRoom(roomName);

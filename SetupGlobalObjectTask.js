@@ -2,8 +2,8 @@ module.exports = (function () {
   'use strict';
 
   var Task = require('Task');
-  var utils = require('utils');
-  var collections = require('collections');
+  var Collection = require('Collection');
+  var CreepCollection = require('CreepCollection');
   var Actions = require('Actions');
   var K = require('K');
   var CreepFactory = require('CreepFactory');
@@ -17,23 +17,33 @@ module.exports = (function () {
   SetupGlobalObjectTask.prototype.constructor = SetupGlobalObjectTask;
 
   SetupGlobalObjectTask.prototype.doTask = function doTask() {
-
-
-    K.rooms = new collections.Collection();
-    K.creeps = new collections.CreepCollection();
+    K.rooms = new Collection();
+    K.spawns = new Collection();
+    K.creeps = new CreepCollection();
+    K.workers = new CreepCollection();
+    K.builders = new CreepCollection();
 
     Object.keys(Game.creeps).forEach(function (key) {
       var creep = Game.creeps[key];
+
       K.creeps.add(creep);
       K.rooms.add(creep.room);
+      switch (creep.memory.type) {
+        case CreepFactory.WORKER.type:
+          K.workers.add(creep);
+          creep.behavior = Actions.harvest;
+          break;
+        case CreepFactory.BUILDER.type:
+          K.builders.add(creep);
+          creep.behavior = Actions.build;
+          break;
+      }
     });
-
-    // setup typed creep collections
-    K.workers  = K.creeps.filter(function (value) { return value && value.memory.type === CreepFactory.WORKER.type });
-    K.builders = K.creeps.filter(function (value) { return value && value.memory.type === CreepFactory.BUILDER.type });
-
-    K.workers .assignAll({ 'behavior': Actions.harvest });
-    K.builders.assignAll({ 'behavior': Actions.build   });
+    Object.keys(Game.spawns).forEach(function (key) {
+      var spawn = Game.spawns[key];
+      K.spawns.add(spawn);
+      K.rooms.add(spawn.room);
+    });
   };
 
   return SetupGlobalObjectTask;
