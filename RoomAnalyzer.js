@@ -21,13 +21,18 @@ module.exports = (function () {
       nearEnergyRatio: 0.1,
       nearDeathRatio: 0.25,
       nearConstructionProgressRatio: 0.3,
-      strategic: false
+      strategic: false,
+      noroad: false,
+      norampart: false,
+      nowall: false,
+      nospawn: false,
+      noextension: false
     };
   };
 
-  RoomAnalyzer.prototype.canRunAnalyzeOn = function (type, analyzeType) {
+  RoomAnalyzer.prototype.canRunAnalyzeOn = function canRunAnalyzeOn(type, analyzeType) {
     return !!(this.analyzis ^ analyzeType) && (type === 0 || !!(type & analyzeType));
-  }
+  };
 
   RoomAnalyzer.prototype.analyze = function analyze(type, options) {
     if (this.canRunAnalyzeOn(type, RoomAnalyzer.TYPE_SPAWNS)) {
@@ -51,7 +56,7 @@ module.exports = (function () {
     return this.result;
   };
 
-  RoomAnalyzer.prototype.invalidateAnalyze = function (type) {
+  RoomAnalyzer.prototype.invalidateAnalyze = function invalidateAnalyze(type) {
     type === 0 ? this.analyzis = 0 : this.analyzis ^= type;
   };
 
@@ -214,7 +219,7 @@ module.exports = (function () {
   };
 
   RoomAnalyzer.prototype.buildStrategicInformationAbout = function buildStrategicInformationAbout(options) {
-
+    // TODO: define what is strategic in a room
   };
 
   RoomAnalyzer.prototype.createDefaultResult = function createDefaultResult() {
