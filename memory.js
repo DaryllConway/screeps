@@ -8,11 +8,11 @@ var defaultMemory = {
   },
   'blueprints': {
     'worker' : {
-      'maxCount': 4,
+      'maxCount': 2, // per room per energySources * spawns
       'bodyparts': ['move', 'move', 'carry', 'carry', 'work']
     },
     'builder': {
-      'maxCount': 3,
+      'maxCount': 3, // per room
       'bodyparts': ['move', 'carry', 'carry', 'work', 'work']
     },
     'scout'  : {
