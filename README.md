@@ -17,8 +17,10 @@ function MyTask() {
   MyTask.__super__.constructor.call(this, 'set a unique id here', 4)
   // this task will be run every 4 ticks
 }
+
+// prototype inheritance
 MyTask.__super__ = Task.prototype;
-MyTask.prototype = Object.create(MyTask.\_\_super\_\_);
+MyTask.prototype = Object.create(MyTask.__super__);
 MyTask.constructor = MyTask;
 
 MyTask.prototype.doTask = function () {
@@ -26,5 +28,7 @@ MyTask.prototype.doTask = function () {
 };
 ```
 
-Référencer les routes
-méthode move à faire
+## TODO
+
+- road referencing
+- move method (Creep wrapper ?)
