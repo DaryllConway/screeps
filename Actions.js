@@ -107,9 +107,9 @@ module.exports = (function () {
           } else {
             console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult].errMessage + ' to energy storage)');
           }
-          if (!this.memory.nextDirection.length) {
-            this.memory.nextDirection = null;
-          }
+        }
+        if (!this.memory.nextDirection.length) {
+          this.memory.nextDirection = null;
         }
       }
       if (this.energy === 0) this.memory.nextEnergyStorageId = null;
@@ -193,9 +193,9 @@ module.exports = (function () {
           } else {
             console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult].errMessage + ' to energy storage)');
           }
-          if (!this.memory.nextDirection.length) {
-            this.memory.nextDirection = null;
-          }
+        }
+        if (!this.memory.nextDirection.length) {
+          this.memory.nextDirection = null;
         }
       }
       if (this.energy === this.energyCapacity) this.memory.nextEnergyStorageId = null;
