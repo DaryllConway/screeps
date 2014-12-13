@@ -4,6 +4,7 @@ module.exports = (function () {
   var Actions = {};
   var RoomAnalyzer = require('RoomAnalyzer');
   var Storage = require('StorageElement');
+  var Exceptions = require('Exceptions');
 
   function getFirstFilledCollection(/* collection1, collection2, collection2, ... */) {
     for (var index in arguments) {
@@ -59,7 +60,7 @@ module.exports = (function () {
   Actions.harvest = function harvest() {
     var nearestEnergyStorage, energyStorages,
       energyStorageAnalyze, analyzer, nextEnergyStorage,
-      transferingResult,
+      transferingResult, actionResult,
       harvesterStorage = Storage.get('assignations.harvester');
 
     if (this.spawning) return;
@@ -87,16 +88,59 @@ module.exports = (function () {
       }
       nextEnergyStorage = Game.getObjectById(this.memory.nextEnergyStorageId);
 
-      this.moveTo(nextEnergyStorage);
-      transferingResult = this.transferEnergy(nextEnergyStorage);
-      if (transferingResult === Game.ERR_FULL || this.energy === 0) {
-        this.memory.nextEnergyStorageId = null;
+      if (this.pos.inRangeTo(nextEnergyStorage.pos, 1)) {
+        // transferEnergy to EnergyContainer
+        actionResult = this.transferEnergy(nextEnergyStorage);
+        if (actionResult !== Game.OK) {
+          console.log('errTransfering(' + this.name + ', ' + Exceptions[actionResult].errMessage + ')');
+        }
+      } else {
+        // move
+        if (!this.memory.nextDirection) {
+          this.memory.nextDirection = this.pos.findPathTo(nextEnergyStorage.pos, { maxOps: 200 })
+            .map(function (path) { return path.direction; });
+        }
+        if (this.fatigue === 0 && this.memory.nextDirection.length) {
+          actionResult = this.move(this.memory.nextDirection[0]);
+          if (actionResult === Game.OK) {
+            this.memory.nextDirection.shift();
+          } else {
+            console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult].errMessage + ' to energy storage)');
+          }
+          if (!this.memory.nextDirection.length) {
+            this.memory.nextDirection = null;
+          }
+        }
       }
+      if (this.energy === 0) this.memory.nextEnergyStorageId = null;
       return;
     }
 
-    this.moveTo(this.target);
-    this.harvest(this.target);
+    if (!this.target) return;
+    if (this.pos.inRangeTo(this.target.pos, 1)) {
+      // harvest
+      actionResult = this.harvest(this.target);
+      if (actionResult !== Game.OK) {
+        console.log('errBuilding(' + this.name + ', ' + Exceptions[actionResult].errMessage + ')');
+      }
+      return;
+    }
+    // move
+    if (!this.memory.nextDirection) {
+      this.memory.nextDirection = this.pos.findPathTo(this.target.pos, { maxOps: 200 })
+        .map(function (path) { return path.direction; });
+    }
+    if (this.fatigue === 0 && this.memory.nextDirection.length) {
+      actionResult = this.move(this.memory.nextDirection[0]);
+      if (actionResult === Game.OK) {
+        this.memory.nextDirection.shift();
+      } else {
+        console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult].errMessage + ')');
+      }
+      if (!this.memory.nextDirection.length) {
+        this.memory.nextDirection = null;
+      }
+    }
   };
 
   Actions.build = function build() {
@@ -134,7 +178,7 @@ module.exports = (function () {
       if (this.pos.inRangeTo(nextEnergyStorage.pos, 1)) {
         actionResult = nextEnergyStorage.transferEnergy(this);
         if (actionResult !== Game.OK) {
-          console.log('errTransfering(' + actionResult + ')');
+          console.log('errTransfering(' + this.name + ', ' + Exceptions[actionResult].errMessage + ')');
         }
       } else {
         // move
@@ -147,7 +191,7 @@ module.exports = (function () {
           if (actionResult === Game.OK) {
             this.memory.nextDirection.shift();
           } else {
-            console.log('errMoving(' + actionResult + ' to energy storage)');
+            console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult].errMessage + ' to energy storage)');
           }
           if (!this.memory.nextDirection.length) {
             this.memory.nextDirection = null;
@@ -163,7 +207,7 @@ module.exports = (function () {
       // build
       actionResult = this.build(this.target);
       if (actionResult !== Game.OK) {
-        console.log('errBuilding(' + actionResult + ')');
+        console.log('errBuilding(' + this.name + ', ' + Exceptions[actionResult].errMessage + ')');
       }
     } else {
       // move
@@ -176,7 +220,7 @@ module.exports = (function () {
         if (actionResult === Game.OK) {
           this.memory.nextDirection.shift();
         } else {
-          console.log('errMoving(' + actionResult + ')');
+          console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult].errMessage + ')');
         }
         if (!this.memory.nextDirection.length) {
           this.memory.nextDirection = null;
