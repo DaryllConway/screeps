@@ -31,4 +31,4 @@ MyTask.prototype.doTask = function () {
 ## TODO
 
 - road referencing
-- move method (Creep wrapper ?)
+- move method
