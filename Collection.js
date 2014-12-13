@@ -96,19 +96,17 @@ module.exports = (function () {
     return this.children[this.children.length - 1] || null;
   };
 
-  Collection.prototype.findNearest = function findNearest(x, y) {
+  Collection.prototype.findNearest = function findNearest(pos, options) {
     var
       nearestIndex = -1, nearestCount = Number.MAX_VALUE,
       index = -1, path;
     if (this.children.length < 2) {
       return this.children[0] || null;
     }
-    if (!y) {
-      y = x.y;
-      x = x.x;
-    }
+    options = options || {};
+    options.maxOps = options.maxOps || 1000;
     while (++index < this.children.length) {
-      if (this.children[index] && (path = this.children[index].pos.findPathTo(x, y)).length < nearestCount) {
+      if (this.children[index] && (path = this.children[index].pos.findPathTo(pos, options)).length < nearestCount && path.length) {
         nearestCount = path.length;
         nearestIndex = index;
       }
