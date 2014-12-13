@@ -1,6 +1,6 @@
 # Overview
 
-This librairy is under construction and add many concepts to help to maintain code as Collection, Storage, Tasks, ...
+This library is under construction and add many concepts to help to maintain and improve the readability of the code as Collection, Storage, Tasks, ...
 
 ## Collection
 
@@ -28,7 +28,24 @@ MyTask.prototype.doTask = function () {
 };
 ```
 
+## RoomAnalyzer
+
+This object analyzes a room. You can analyze spawns, creeps, structures, extensions, construction sites or sources separatly or not;
+
+if you call the analyze method many times in your code, the room related to the RoomAnalyzer instance will not be calculated again.
+The structure of result of the analysis is in dataDefaultRoomAnalyzerResult.js
+
+You can pass several types with the byte operator '|'
+
+```
+var analyzer = RoomAnalyzer.getRoom(creep.room)
+var result = analyzer.analyze(RoomAnalyzer.TYPE_STRUCTURES | RoomAnalyzer.TYPE_CONSTRUCTION_SITES | RoomAnalyzer.TYPE_CREEPS);
+```
+
 ## TODO
 
+- define max bodyparts dynamically
+- guard behavior
 - road referencing
-- move method
+
+
