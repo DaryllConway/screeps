@@ -61,7 +61,7 @@ module.exports = (function () {
     var nearestEnergyStorage, energyStorages,
       energyStorageAnalyze, analyzer, nextEnergyStorage,
       transferingResult, actionResult,
-      harvesterStorage = Storage.get('assignations.harvester');
+      harvesterStorage = Storage.get('assignations.worker');
 
     if (this.spawning) return;
 
@@ -69,7 +69,7 @@ module.exports = (function () {
 
     if (!this.target || !Game.getObjectById(this.target.id)) {
       // if the target is no longer available
-      setTargetTo(this, 'harvester', getNextTargetIn(harvesterStorage));
+      setTargetTo(this, 'worker', getNextTargetIn(harvesterStorage));
     }
 
     if (this.energy === this.energyCapacity) {
