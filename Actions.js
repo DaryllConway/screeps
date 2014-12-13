@@ -151,7 +151,7 @@ module.exports = (function () {
       }
       if (nearestOne) {
         this.memory.lastTransport = nearestOne.memory.type;
-        console.log('assign ' + this.name + '(' + this.energy + '/' + this.energyCapacity +' )' + ' with ' + nearestOne.name + '(' + nearestOne.energy + '/' + nearestOne.energyCapacity +')')
+        // console.log('assign ' + this.name + '(' + this.energy + '/' + this.energyCapacity +' )' + ' with ' + nearestOne.name + '(' + nearestOne.energy + '/' + nearestOne.energyCapacity +')')
         this.memory.nextTransporterId = nearestOne.id;
         nearestOne.memory.nextTransporterId = this.id;
         this.memory.nextDirection = nearestOne.memory.nextDirection = null;
