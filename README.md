@@ -10,7 +10,7 @@ This is an object that embed many methods to help manipulating entities.
 
 A Task is a code that will be run on every n tick.
 
-'''javascript
+```javascript
 var Task = require('Task');
 
 function MyTask() {
@@ -24,4 +24,7 @@ MyTask.constructor = MyTask;
 MyTask.prototype.doTask = function () {
   // do what you want here
 };
-'''
+```
+
+Référencer les routes
+méthode move à faire
