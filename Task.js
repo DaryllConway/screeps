@@ -31,9 +31,6 @@ module.exports = (function () {
   Task.prototype.run = function run() {
     var delta = Storage.get(this.deltaKey);
     if (delta === 0 || Game.time > Storage.get(this.actionId) + delta) {
-      if (Storage.get('debugMode') === true) {
-        console.log('task.run(' + this.actionId + ')');
-      }
       // Run the task
       this.doTask();
       Storage.set(this.actionId, Game.time);
