@@ -6,9 +6,10 @@ module.exports = (function () {
   var RoomAnalyzer = require('RoomAnalyzer');
 
   function CreepFactory() {
-    this.keys = ['WORKER', 'BUILDER'];
+    this.keys = ['WORKER', 'BUILDER', 'TRANSPORTER'];
     this.WORKER  = new CreepBlueprint('Worker');
     this.BUILDER = new CreepBlueprint('Builder');
+    this.TRANSPORTER = new CreepBlueprint('Transporter');
     // this.SCOUT   = new CreepBlueprint('Scout');
     this.methods = this.keys.map((function (type) {
       return this['spawn' + String(type.charAt(0).toUpperCase() + type.substr(1, type.length).toLowerCase()) + 'Into'];
@@ -17,9 +18,18 @@ module.exports = (function () {
 
   CreepFactory.prototype.spawnWorkerInto = function spawnWorkerInto(spawn) {
     var analysis = RoomAnalyzer.getRoom(spawn.room).analyze(RoomAnalyzer.TYPE_SPAWNS | RoomAnalyzer.TYPE_SOURCES);
-    if (this.WORKER.getChildrenInRoom(spawn.room).size() < analysis.energySources.count * this.WORKER.getMaxCount() * analysis.spawn.count) {
+    if (this.WORKER.getChildrenInRoom(spawn.room).size() < analysis.energySources.count * this.WORKER.getMaxCount()) {
       if (Memory.debugMode) console.log('spawn worker');
       this.WORKER.create(spawn);
+      return true;
+    }
+    return false;
+  };
+
+  CreepFactory.prototype.spawnTransporterInto = function spawnTransporterInto(spawn) {
+    if (this.TRANSPORTER.getChildrenInRoom(spawn.room).size() < this.WORKER.getChildrenInRoom(spawn.room).size() * this.TRANSPORTER.getMaxCount()) {
+      if (Memory.debugMode) console.log('spawn transporter');
+      this.TRANSPORTER.create(spawn);
       return true;
     }
     return false;

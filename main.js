@@ -25,20 +25,21 @@
     TaskManager = require('TaskManager');
     SanitizeMemoryTask = require('SanitizeMemoryTask');
     SetupGlobalObjectTask = require('SetupGlobalObjectTask');
-    BuildRoadTask = require('BuildRoadTask');
+    // BuildRoadTask = require('BuildRoadTask');
     SpawnCreepTask = require('SpawnCreepTask');
     RoomAnalyzer = require('RoomAnalyzer');
 
     tasks = new TaskManager();
     tasks.add(new SetupGlobalObjectTask());
     tasks.add(new SanitizeMemoryTask());
-    tasks.add(new BuildRoadTask());
+    // tasks.add(new BuildRoadTask());
     tasks.add(new SpawnCreepTask());
 
     tasks.runTasks();
 
     K.workers.work();
     K.builders.work();
+    K.transporters.work();
 
     RoomAnalyzer.disposeAll();
 

@@ -2,18 +2,23 @@ var utils = require('utils');
 
 var defaultMemory = {
   'assignations': {
-    'worker':  {},
+    'worker': {},
     'builder': {},
-    'scout':   {}
+    'transporter': {},
+    'scout': {}
   },
   'blueprints': {
     'worker' : {
-      'maxCount': 2, // per room per energySources * spawns
-      'bodyparts': ['move', 'move', 'carry', 'carry', 'work']
+      'maxCount': 2, // per room per energySources
+      'bodyparts': ['move', 'carry', 'work', 'work', 'work']
     },
     'builder': {
-      'maxCount': 3, // per room
-      'bodyparts': ['move', 'carry', 'carry', 'work', 'work']
+      'maxCount': 5, // per room
+      'bodyparts': ['move', 'move', 'carry', 'work', 'work']
+    },
+    'transporter': {
+      'maxCount': 2, // per room per worker
+      'bodyparts': ['move', 'move', 'move', 'carry', 'carry']
     },
     'scout'  : {
       'maxCount': 0,

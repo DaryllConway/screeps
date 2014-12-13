@@ -22,10 +22,10 @@ module.exports = (function () {
     K.creeps = new CreepCollection();
     K.workers = new CreepCollection();
     K.builders = new CreepCollection();
+    K.transporters = new CreepCollection();
 
     Object.keys(Game.creeps).forEach(function (key) {
       var creep = Game.creeps[key];
-
       K.creeps.add(creep);
       K.rooms.add(creep.room);
       switch (creep.memory.type) {
@@ -36,6 +36,10 @@ module.exports = (function () {
         case CreepFactory.BUILDER.type:
           K.builders.add(creep);
           creep.behavior = Actions.build;
+          break;
+        case CreepFactory.TRANSPORTER.type:
+          K.transporters.add(creep);
+          creep.behavior = Actions.transport;
           break;
       }
     });

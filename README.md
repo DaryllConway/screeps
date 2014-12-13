@@ -37,7 +37,7 @@ The structure of result of the analysis is in dataDefaultRoomAnalyzerResult.js
 
 You can pass several types with the byte operator '|'
 
-```
+```javascript
 var analyzer = RoomAnalyzer.getRoom(creep.room)
 var result = analyzer.analyze(RoomAnalyzer.TYPE_STRUCTURES | RoomAnalyzer.TYPE_CONSTRUCTION_SITES | RoomAnalyzer.TYPE_CREEPS);
 ```

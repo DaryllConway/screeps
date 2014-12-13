@@ -17,9 +17,10 @@ module.exports = (function () {
   SanitizeMemoryTask.prototype.doTask = function doTask() {
     var
       builderStorage = Storage.get('assignations.builder'),
-      harvesterStorage = Storage.get('assignations.worker');
+      harvesterStorage = Storage.get('assignations.worker'),
+      transporterStorage = Storage.get('assignations.transporter');
 
-    [builderStorage, harvesterStorage].forEach(function (storage) {
+    [builderStorage, harvesterStorage, transporterStorage].forEach(function (storage) {
       storage.keys().forEach(function (objId) {
         if (!Game.getObjectById(objId)) storage.destroy(objId);
       })
@@ -35,6 +36,12 @@ module.exports = (function () {
       room.find(Game.SOURCES).forEach(function (source) {
         if (!harvesterStorage.get(source.id)) {
           harvesterStorage.set(source.id, []);
+        }
+      });
+
+      K.workers.forEach(function (worker) {
+        if (!transporterStorage.get(worker.id)) {
+          transporterStorage.set(worker.id, []);
         }
       });
     });
