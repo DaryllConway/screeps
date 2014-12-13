@@ -17,7 +17,7 @@ module.exports = (function () {
   SanitizeMemoryTask.prototype.doTask = function doTask() {
     var
       builderStorage = Storage.get('assignations.builder'),
-      harvesterStorage = Storage.get('assignations.harvester');
+      harvesterStorage = Storage.get('assignations.worker');
 
     [builderStorage, harvesterStorage].forEach(function (storage) {
       storage.keys().forEach(function (objId) {
@@ -31,6 +31,7 @@ module.exports = (function () {
           builderStorage.set(constructionSite.id, []);
         }
       });
+
       room.find(Game.SOURCES).forEach(function (source) {
         if (!harvesterStorage.get(source.id)) {
           harvesterStorage.set(source.id, []);

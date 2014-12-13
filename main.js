@@ -1,10 +1,14 @@
 (function () {
   'use strict';
 
+  var
+    defaultMemory, K, TaskManager, SanitizeMemoryTask, SetupGlobalObjectTask,
+    BuildRoadTask, SpawnCreepTask, RoomAnalyzer, tasks;
+
   if (!('isRunning' in Memory)) {
     // setup default memory if is empty
     console.log('setup default memory');
-    var defaultMemory = require('memory');
+    defaultMemory = require('memory');
     Object.keys(defaultMemory).forEach(function (key) {
       Memory[key] = defaultMemory[key];
     });
@@ -16,15 +20,16 @@
 
   try {
 
-    var K = require('K');
+    K = require('K');
 
-    var TaskManager = require('TaskManager');
-    var SanitizeMemoryTask = require('SanitizeMemoryTask');
-    var SetupGlobalObjectTask = require('SetupGlobalObjectTask');
-    var BuildRoadTask = require('BuildRoadTask');
-    var SpawnCreepTask = require('SpawnCreepTask');
+    TaskManager = require('TaskManager');
+    SanitizeMemoryTask = require('SanitizeMemoryTask');
+    SetupGlobalObjectTask = require('SetupGlobalObjectTask');
+    BuildRoadTask = require('BuildRoadTask');
+    SpawnCreepTask = require('SpawnCreepTask');
+    RoomAnalyzer = require('RoomAnalyzer');
 
-    var tasks = new TaskManager();
+    tasks = new TaskManager();
     tasks.add(new SetupGlobalObjectTask());
     tasks.add(new SanitizeMemoryTask());
     tasks.add(new BuildRoadTask());
@@ -34,6 +39,8 @@
 
     K.workers.work();
     K.builders.work();
+
+    RoomAnalyzer.disposeAll();
 
   } catch (err) {
     if (Memory.debugMode === true) {

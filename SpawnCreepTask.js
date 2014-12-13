@@ -12,9 +12,7 @@ module.exports = (function () {
   SpawnCreepTask.prototype = Object.create(SpawnCreepTask.__super__);
   SpawnCreepTask.prototype.constructor = SpawnCreepTask;
 
-  SpawnCreepTask.prototype.doTask = function doTask() {
-    CreepFactory.tryToFillAll();
-  };
+  SpawnCreepTask.prototype.doTask = CreepFactory.spawn.bind(CreepFactory);
 
   return SpawnCreepTask;
 

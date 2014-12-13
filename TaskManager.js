@@ -10,10 +10,10 @@ module.exports = (function () {
   TaskManager.prototype = Object.create(TaskManager.__super__);
   TaskManager.prototype.constructor = TaskManager;
 
-  function iterator(task) { task.run(); }
   TaskManager.prototype.runTasks = function() {
-    this.forEach(iterator);
+    this.forEach(this.iterator);
   };
+  TaskManager.prototype.iterator = function iterator(task) { task.run(); };
 
   return TaskManager;
 
