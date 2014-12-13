@@ -82,8 +82,8 @@ module.exports = (function () {
 
   RoomAnalyzer.prototype.analyzeExtensions = function analyzeExtensions(options) {
     var self = this;
-    this.room.find(Game.STRUCTURE_EXTENSION).forEach(function (extension) {
-      self.analyzeEnergyInformationAbout(extension, options);
+    this.room.find(Game.MY_STRUCTURES).forEach(function (structure) {
+      if (structure.structureType === Game.STRUCTURE_EXTENSION) self.analyzeEnergyInformationAbout(structure, options);
     });
     this.analyzis |= RoomAnalyzer.TYPE_EXTENSIONS;
   };
