@@ -57,6 +57,36 @@ module.exports = (function () {
     return null;
   }
 
+  function findPathTo(from, to) {
+    var path = from.findPathTo(to, { maxOps: 200 });
+    if (!path.length || !to.equalsTo(path[path.length - 1])) {
+      path = from.findPathTo(to, { maxOps: 1000 });
+    }
+    return !path.length || !to.equalsTo(path[path.length - 1]) ? [] : path;
+  }
+
+  function moveTo(targetedPosition, toDo) {
+    var actionResult, nextDirection;
+    if (!this.memory.nextDirection || this.pos.inRangeTo(targetedPosition, 4)) {
+      // update nextDirection if the creep haven't any one
+      // or if it's next to the target
+      nextDirection = findPathTo(this.pos, targetedPosition).map(function (path) { return path.direction; });
+      if (!nextDirection.length) return;
+      this.memory.nextDirection = nextDirection;
+    }
+    if (this.fatigue === 0 && this.memory.nextDirection.length) {
+      actionResult = this.move(this.memory.nextDirection[0]);
+      if (actionResult === Game.OK) {
+        this.memory.nextDirection.shift();
+      } else {
+        console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult].errMessage + ')');
+      }
+    }
+    if (!this.memory.nextDirection.length) {
+      this.memory.nextDirection = null;
+    }
+  }
+
   Actions.harvest = function harvest() {
     var nearestEnergyStorage, energyStorages,
       energyStorageAnalyze, analyzer, nextEnergyStorage,
@@ -83,10 +113,19 @@ module.exports = (function () {
         if (energyStorages = getFirstFilledCollection(energyStorageAnalyze.empty, energyStorageAnalyze.nearEmpty, energyStorageAnalyze.others, energyStorageAnalyze.nearFull)) {
           nearestEnergyStorage = energyStorages.findNearest(this.target ? this.target.pos : this.pos);
         }
-        if (!nearestEnergyStorage) return;
+        if (!nearestEnergyStorage) {
+          // move away
+          if (!this.pos.inRangeTo(this.target.pos, 3)) {
+            moveTo.call(this, this.target.pos);
+          }
+          return;
+        }
+        this.memory.nextDirection = null;
         this.memory.nextEnergyStorageId = nearestEnergyStorage.id;
       }
       nextEnergyStorage = Game.getObjectById(this.memory.nextEnergyStorageId);
+
+      if (nextEnergyStorage.energy === nextEnergyStorage.energyCapacity) return;
 
       if (this.pos.inRangeTo(nextEnergyStorage.pos, 1)) {
         // transferEnergy to EnergyContainer
@@ -96,21 +135,7 @@ module.exports = (function () {
         }
       } else {
         // move
-        if (!this.memory.nextDirection) {
-          this.memory.nextDirection = this.pos.findPathTo(nextEnergyStorage.pos, { maxOps: 200 })
-            .map(function (path) { return path.direction; });
-        }
-        if (this.fatigue === 0 && this.memory.nextDirection.length) {
-          actionResult = this.move(this.memory.nextDirection[0]);
-          if (actionResult === Game.OK) {
-            this.memory.nextDirection.shift();
-          } else {
-            console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult].errMessage + ' to energy storage)');
-          }
-        }
-        if (!this.memory.nextDirection.length) {
-          this.memory.nextDirection = null;
-        }
+        moveTo.call(this, nextEnergyStorage.pos);
       }
       if (this.energy === 0) this.memory.nextEnergyStorageId = null;
       return;
@@ -125,22 +150,7 @@ module.exports = (function () {
       }
       return;
     }
-    // move
-    if (!this.memory.nextDirection) {
-      this.memory.nextDirection = this.pos.findPathTo(this.target.pos, { maxOps: 200 })
-        .map(function (path) { return path.direction; });
-    }
-    if (this.fatigue === 0 && this.memory.nextDirection.length) {
-      actionResult = this.move(this.memory.nextDirection[0]);
-      if (actionResult === Game.OK) {
-        this.memory.nextDirection.shift();
-      } else {
-        console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult].errMessage + ')');
-      }
-      if (!this.memory.nextDirection.length) {
-        this.memory.nextDirection = null;
-      }
-    }
+    moveTo.call(this, this.target.pos);
   };
 
   Actions.build = function build() {
@@ -169,34 +179,26 @@ module.exports = (function () {
           nearestEnergyStorage = energyStorages.findNearest(this.target ? this.target.pos : this.pos);
         }
 
-        if (!nearestEnergyStorage) return;
+        if (!nearestEnergyStorage) {
+          if (this.target && !this.pos.inRangeTo(this.target.pos, 3)) {
+            moveTo.call(this, this.target.pos);
+          }
+          return;
+        }
         this.memory.nextDirection = null;
         this.memory.nextEnergyStorageId = nearestEnergyStorage.id;
       }
       nextEnergyStorage = Game.getObjectById(this.memory.nextEnergyStorageId);
 
       if (this.pos.inRangeTo(nextEnergyStorage.pos, 1)) {
+        this.memory.nextDirection = null;
         actionResult = nextEnergyStorage.transferEnergy(this);
         if (actionResult !== Game.OK) {
           console.log('errTransfering(' + this.name + ', ' + Exceptions[actionResult].errMessage + ')');
         }
       } else {
         // move
-        if (!this.memory.nextDirection) {
-          this.memory.nextDirection = this.pos.findPathTo(nextEnergyStorage.pos, { maxOps: 200 })
-            .map(function (path) { return path.direction; });
-        }
-        if (this.fatigue === 0 && this.memory.nextDirection.length) {
-          actionResult = this.move(this.memory.nextDirection[0]);
-          if (actionResult === Game.OK) {
-            this.memory.nextDirection.shift();
-          } else {
-            console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult].errMessage + ' to energy storage)');
-          }
-        }
-        if (!this.memory.nextDirection.length) {
-          this.memory.nextDirection = null;
-        }
+        moveTo.call(this, nextEnergyStorage.pos);
       }
       if (this.energy === this.energyCapacity) this.memory.nextEnergyStorageId = null;
       return;
@@ -211,21 +213,7 @@ module.exports = (function () {
       }
     } else {
       // move
-      if (!this.memory.nextDirection) {
-        this.memory.nextDirection = this.pos.findPathTo(this.target.pos, { maxOps: 200 })
-          .map(function (path) { return path.direction; });
-      }
-      if (this.fatigue === 0 && this.memory.nextDirection.length) {
-        actionResult = this.move(this.memory.nextDirection[0]);
-        if (actionResult === Game.OK) {
-          this.memory.nextDirection.shift();
-        } else {
-          console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult].errMessage + ')');
-        }
-        if (!this.memory.nextDirection.length) {
-          this.memory.nextDirection = null;
-        }
-      }
+      moveTo.call(this, this.target.pos);
     }
 
   };
