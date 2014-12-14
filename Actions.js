@@ -87,18 +87,22 @@ module.exports = (function () {
     }
   }
 
-  function transporterFindBuilder() {
+  function getMaxEnergyToTransfer(from, to) {
+    return to.energyCapacity - to.energy > from.energy ? from.energy : to.energyCapacity - to.energy;
+  }
+
+  function transporterFindBuilder(range) {
     return CreepFactory.BUILDER.getChildrenInRoom(this.room)
       .filter(function (creep) {
-        return creep.memory.target
-          && !creep.memory.nextTransporterId
-          && this.pos.inRangeTo(creep.pos, 15);
+        return creep.memory.target && !creep.memory.nextTransporterId
+          && (range === 0 || this.pos.inRangeTo(creep.pos, range));
       }, this).findNearest(this.pos);
   }
 
   function transporterFindTransporter() {
     if (!this.memory.nextEnergyStorageId) return null;
     var myDistanceToEnergyStorage = findPathTo(this.pos, Game.getObjectById(this.memory.nextEnergyStorageId).pos).length;
+    if (myDistanceToEnergyStorage < 3) return null;
     return CreepFactory.TRANSPORTER.getChildrenInRoom(this.room)
       .filter(function (creep) {
         if (!creep.memory.nextEnergyStorageId) return;
@@ -117,7 +121,7 @@ module.exports = (function () {
 
   Actions.transport = function transport() {
     var nearestEnergyStorage, energyStorages,
-      energyStorageAnalyze, analyzer,
+      energyStorageAnalyze, analyzer, energyToTransfer,
       nearestOne, actionResult, transporterStorage = Storage.get('assignations.transporter');
     if (this.spawning) return;
 
@@ -145,7 +149,7 @@ module.exports = (function () {
     if (!this.memory.nextTransporterId) {
       // find the nearest creep empty with goTo === 'worker'
       if (this.memory.lastTransport !== 'builder' || (!nearestEnergyStorage || nearestEnergyStorage.energy === nearestEnergyStorage.energyCapacity)) {
-        nearestOne = transporterFindBuilder.call(this);
+        nearestOne = transporterFindBuilder.call(this, (!nearestEnergyStorage || nearestEnergyStorage.energy === nearestEnergyStorage.energyCapacity) ? 0 : 15);
       }
       if (!nearestOne && this.memory.lastTransport !== 'transporter') {
         nearestOne = transporterFindTransporter.call(this);
@@ -166,14 +170,13 @@ module.exports = (function () {
 
         if (this.pos.inRangeTo(destinationObject.pos, 1)) {
           if (this.energy === this.energyCapacity) {
-            if (this.energy > destinationObject.energyCapacity) {
-              actionResult = this.transferEnergy(destinationObject, destinationObject.energyCapacity);
-            } else {
-              actionResult = this.transferEnergy(destinationObject);
-              if (actionResult === Game.OK) {
-                this.memory.goTo = 'worker';
-              }
-              if (destinationObject.memory.type === CreepFactory.TRANSPORTER.type) destinationObject.memory.goTo  = 'storage';
+            energyToTransfer = getMaxEnergyToTransfer(this, destinationObject);
+            actionResult = this.transferEnergy(destinationObject, energyToTransfer);
+            if (energyToTransfer === this.energy) {
+              this.memory.goTo = 'worker';
+            }
+            if (destinationObject.memory.type === CreepFactory.TRANSPORTER.type) {
+              destinationObject.memory.goTo = 'storage';
             }
           } else {
             actionResult = destinationObject.transferEnergy(this);
@@ -198,9 +201,11 @@ module.exports = (function () {
     if (this.memory.nextEnergyStorageId && this.energy === this.energyCapacity) {
       destinationObject = Game.getObjectById(this.memory.nextEnergyStorageId);
       if (this.pos.inRangeTo(destinationObject.pos, 1)) {
-        actionResult = this.transferEnergy(destinationObject, this.energy);
-        if (actionResult === Game.OK) {
+        energyToTransfer = getMaxEnergyToTransfer(this, destinationObject);
+        actionResult = this.transferEnergy(destinationObject, energyToTransfer);
+        if (actionResult === Game.OK && energyToTransfer === this.energy) {
           this.memory.goTo = 'worker';
+          this.memory.lastTransport = 'energyStorage';
           this.memory.nextTransporterId = this.memory.nextDirection = null;
         }
       } else {
@@ -210,7 +215,8 @@ module.exports = (function () {
     }
     if (this.target) {
       if (this.pos.inRangeTo(this.target.pos, 1)) {
-        actionResult = this.target.transferEnergy(this);
+        energyToTransfer = getMaxEnergyToTransfer(this.target, this);
+        actionResult = this.target.transferEnergy(this, energyToTransfer);
         if (actionResult === Game.OK) {
           this.memory.goTo = 'storage';
           this.memory.nextEnergyStorageId = this.memory.nextTransporterId = this.memory.nextDirection = null;
