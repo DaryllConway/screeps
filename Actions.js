@@ -132,13 +132,12 @@ module.exports = (function () {
 
     }
 
+    //nearestEnergyStorage = Game.getObjectById(this.memory.)
     // find the nearest filled energy storage to the target or me
-    // and transferEnergy from me
-    // if no energyStorage next to me, wait
     analyzer = RoomAnalyzer.getRoom(this.room.name);
-    energyStorageAnalyze = analyzer.analyze(RoomAnalyzer.TYPE_SPAWNS | RoomAnalyzer.TYPE_EXTENSIONS).energyStorages;
+    energyStorageAnalyze = analyzer.analyze(RoomAnalyzer.TYPE_ENERGY_STORAGES).energyStorages;
 
-    if (energyStorages = getFirstFilledCollection(energyStorageAnalyze.empty, energyStorageAnalyze.nearEmpty, energyStorageAnalyze.others, energyStorageAnalyze.nearFull)) {
+    if (energyStorages = getFirstFilledCollection(energyStorageAnalyze.empty, energyStorageAnalyze.nearEmpty, energyStorageAnalyze.others)) {
       nearestEnergyStorage = energyStorages.findNearest(this.target ? this.target.pos : this.pos);
     }
     if (nearestEnergyStorage) {
@@ -155,7 +154,6 @@ module.exports = (function () {
         nearestOne = transporterFindTransporter.call(this);
       }
       if (nearestOne) {
-        this.memory.lastTransport = nearestOne.memory.type;
         // console.log('assign ' + this.name + '(' + this.energy + '/' + this.energyCapacity +' )' + ' with ' + nearestOne.name + '(' + nearestOne.energy + '/' + nearestOne.energyCapacity +')')
         this.memory.nextTransporterId = nearestOne.id;
         nearestOne.memory.nextTransporterId = this.id;
@@ -178,6 +176,7 @@ module.exports = (function () {
             if (destinationObject.memory.type === CreepFactory.TRANSPORTER.type) {
               destinationObject.memory.goTo = 'storage';
             }
+            this.memory.lastTransport = destinationObject.memory.type;
           } else {
             actionResult = destinationObject.transferEnergy(this);
             if (actionResult === Game.OK) {
@@ -247,52 +246,15 @@ module.exports = (function () {
   };
 
   Actions.build = function build() {
-    var analyzer, nearestEnergyStorage, energyStorages, energyStorageAnalyze,
-      actionResult,
-      builderStorage = Storage.get('assignations.builder'), nextEnergyStorage;
+    var  builderStorage = Storage.get('assignations.builder');
 
     if (this.spawning) return;
 
     this.target = getTargetOf(this, builderStorage);
-
     if (!this.target || !Game.getObjectById(this.target.id)) {
       // if the target is no longer available
       setTargetTo(this, 'builder', getNextTargetIn(builderStorage));
     }
-
-    // if (this.energy === 0) {
-    //   if (!this.memory.nextEnergyStorageId) {
-    //     // find the nearest filled energy storage to the target or me
-    //     // and transferEnergy to me
-    //     // if no energyStorage next to me, wait
-    //     analyzer = RoomAnalyzer.getRoom(this.room.name)
-    //     energyStorageAnalyze = analyzer.analyze(RoomAnalyzer.TYPE_SPAWNS).energyStorages;
-
-    //     if (energyStorages = getFirstFilledCollection(energyStorageAnalyze.filled.merge(energyStorageAnalyze.nearFull), energyStorageAnalyze.others)) {
-    //       nearestEnergyStorage = energyStorages.findNearest(this.target ? this.target.pos : this.pos);
-    //     }
-
-    //     if (!nearestEnergyStorage) {
-    //       if (this.target && !this.pos.inRangeTo(this.target.pos, 3)) {
-    //         moveTo.call(this, this.target.pos);
-    //       }
-    //       return;
-    //     }
-    //     this.memory.nextDirection = null;
-    //     this.memory.nextEnergyStorageId = nearestEnergyStorage.id;
-    //   }
-    //   nextEnergyStorage = nearestEnergyStorage || Game.getObjectById(this.memory.nextEnergyStorageId);
-
-    //   if (this.pos.inRangeTo(nextEnergyStorage.pos, 1)) {
-    //     this.memory.nextDirection = null;
-    //     nextEnergyStorage.transferEnergy(this);
-    //   } else {
-    //     // move
-    //     moveTo.call(this, nextEnergyStorage.pos);
-    //   }
-    //   if (this.energy === this.energyCapacity) this.memory.nextEnergyStorageId = null;
-    //   return;
-    // }
 
     if (!this.target) return;
     if (this.pos.inRangeTo(this.target.pos, 1)) {

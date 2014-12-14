@@ -17,9 +17,13 @@ module.exports = (function () {
         nearEmpty: new Collection(),
         nearFull: new Collection(),
         others: new Collection(),
+        count: 0,
         totalEnergy: 0,
         totalEnergyCapacity: 0,
-        count: 0
+        extensionsTotalEnergy: 0,
+        extensionsTotalEnergyCapacity: 0,
+        spawnsTotalEnergy: 0,
+        spawnsTotalEnergyCapacity: 0
       },
       energySources: {
         filled: new Collection(),

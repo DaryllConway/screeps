@@ -10,7 +10,7 @@ module.exports = (function () {
   }
 
   var lastByte = 1;
-  "spawns creeps structures extensions construction_sites sources".split(' ').forEach(function (value) {
+  "spawns creeps structures extensions construction_sites sources energy_storages".split(' ').forEach(function (value) {
     lastByte = RoomAnalyzer['TYPE_' + value.toUpperCase()] = lastByte * 2;
   });
 
@@ -53,6 +53,9 @@ module.exports = (function () {
     if (this.canRunAnalyzeOn(type, RoomAnalyzer.TYPE_SOURCES)) {
       this.analyzeSources(options);
     }
+    if (this.canRunAnalyzeOn(type, RoomAnalyzer.TYPE_ENERGY_STORAGES)) {
+      this.analyzeEnergyStorages(options);
+    }
     return this.result;
   };
 
@@ -84,7 +87,6 @@ module.exports = (function () {
     var self = this;
     this.room.find(Game.MY_STRUCTURES).forEach(function (structure) {
       if (structure.structureType === Game.STRUCTURE_EXTENSION) {
-        self.analyzeEnergyInformationAbout(structure, options);
         self.analyzeExtensionInformationAbout(structure, options);
       }
     });
@@ -92,17 +94,26 @@ module.exports = (function () {
   };
 
   RoomAnalyzer.prototype.analyzeSpawns = function analyzeSpawns(options) {
-    var result = this.result;
     var self = this;
     this.room.find(Game.MY_SPAWNS).forEach(function (spawn) {
-      self.analyzeEnergyInformationAbout(spawn, options);
       self.analyzeSpawnInformationAbout(spawn, options);
     });
     this.analyzis |= RoomAnalyzer.TYPE_SPAWNS;
   };
 
+  RoomAnalyzer.prototype.analyzeEnergyStorages = function analyzeEnergyStorages(options) {
+    var self = this;
+    this.room.find(Game.MY_STRUCTURES).forEach(function (structure) {
+      if (structure.structureType === Game.STRUCTURE_EXTENSION) {
+        self.analyzeEnergyInformationAbout(structure, options);
+      }
+    });
+    this.room.find(Game.MY_SPAWNS).forEach(function (spawn) {
+      self.analyzeEnergyInformationAbout(spawn, options);
+    });
+  };
+
   RoomAnalyzer.prototype.analyzeConstructionSites = function analyzeConstructionSites(options) {
-    var result = this.result;
     var self = this;
     this.room.find(Game.CONSTRUCTION_SITES).forEach(function (site) {
       self.analyzeConstructionSitesInformationAbout(site, options);
@@ -111,7 +122,6 @@ module.exports = (function () {
   };
 
   RoomAnalyzer.prototype.analyzeSources = function analyzeSources(options) {
-    var result = this.result;
     var self = this;
     this.room.find(Game.SOURCES).forEach(function (source) {
       self.analyzeSourcesInformationAbout(source, options);
@@ -125,6 +135,14 @@ module.exports = (function () {
 
     result.totalEnergy += structure.energy;
     result.totalEnergyCapacity += structure.energyCapacity;
+    if (structure.structureType === Game.STRUCTURE_EXTENSION) {
+      result.extensionsTotalEnergy += structure.energy;
+      result.extensionsTotalEnergyCapacity += structure.energyCapacity;
+    } else {
+      result.spawnsTotalEnergy += structure.energy;
+      result.spawnsTotalEnergyCapacity += structure.energyCapacity;
+    }
+
     result.count += 1;
 
     var energyRatio = structure.energy / structure.energyCapacity;
