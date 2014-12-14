@@ -27,7 +27,9 @@ module.exports = (function () {
     });
 
     K.rooms.forEach(function (room) {
-      room.find(Game.CONSTRUCTION_SITES).forEach(function (constructionSite) {
+      var constructionSites = room.find(Game.CONSTRUCTION_SITES);
+      Storage.set('blueprints.builder.maxCount', constructionSites.length);
+      constructionSites.forEach(function (constructionSite) {
         if (!builderStorage.get(constructionSite.id)) {
           builderStorage.set(constructionSite.id, []);
         }
