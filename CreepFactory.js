@@ -17,8 +17,12 @@ module.exports = (function () {
   }
 
   CreepFactory.prototype.spawnWorkerInto = function spawnWorkerInto(spawn) {
-    var analysis = RoomAnalyzer.getRoom(spawn.room).analyze(RoomAnalyzer.TYPE_SPAWNS | RoomAnalyzer.TYPE_SOURCES);
-    if (this.WORKER.getChildrenInRoom(spawn.room).size() < analysis.energySources.count * this.WORKER.getMaxCount()) {
+    var analysis = RoomAnalyzer.getRoom(spawn.room).analyze(RoomAnalyzer.TYPE_SPAWNS | RoomAnalyzer.TYPE_SOURCES | RoomAnalyzer.TYPE_EXTENSIONS);
+    var maxCount = analysis.energySources.count;
+    if (analysis.extensions.count > 1) {
+      maxCount *= this.WORKER.getMaxCount();
+    }
+    if (this.WORKER.getChildrenInRoom(spawn.room).size() < maxCount) {
       if (Memory.debugMode) console.log('spawn worker');
       this.WORKER.create(spawn);
       return true;
@@ -27,7 +31,12 @@ module.exports = (function () {
   };
 
   CreepFactory.prototype.spawnTransporterInto = function spawnTransporterInto(spawn) {
-    if (this.TRANSPORTER.getChildrenInRoom(spawn.room).size() < this.WORKER.getChildrenInRoom(spawn.room).size() * this.TRANSPORTER.getMaxCount()) {
+    var analysis = RoomAnalyzer.getRoom(spawn.room).analyze(RoomAnalyzer.TYPE_EXTENSIONS);
+    var maxCount = this.WORKER.getChildrenInRoom(spawn.room).size();
+    if (analysis.extensions.count > 1) {
+      maxCount *= this.TRANSPORTER.getMaxCount();
+    }
+    if (this.TRANSPORTER.getChildrenInRoom(spawn.room).size() < maxCount) {
       if (Memory.debugMode) console.log('spawn transporter');
       this.TRANSPORTER.create(spawn);
       return true;
