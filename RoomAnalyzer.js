@@ -31,7 +31,7 @@ module.exports = (function () {
   };
 
   RoomAnalyzer.prototype.canRunAnalyzeOn = function canRunAnalyzeOn(type, analyzeType) {
-    return !!(this.analyzis ^ analyzeType) && (type === 0 || !!(type & analyzeType));
+    return (type === 0 || !!(type & analyzeType)) && !(this.analyzis & analyzeType);
   };
 
   RoomAnalyzer.prototype.analyze = function analyze(type, options) {
