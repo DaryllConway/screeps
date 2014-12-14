@@ -41,6 +41,9 @@ module.exports = (function () {
         damaged: new Collection(),
         count: 0
       },
+      extensions: {
+        count: 0
+      },
       creeps: {
         workers: new CreepCollection(),
         builder: new CreepCollection(),

@@ -83,7 +83,10 @@ module.exports = (function () {
   RoomAnalyzer.prototype.analyzeExtensions = function analyzeExtensions(options) {
     var self = this;
     this.room.find(Game.MY_STRUCTURES).forEach(function (structure) {
-      if (structure.structureType === Game.STRUCTURE_EXTENSION) self.analyzeEnergyInformationAbout(structure, options);
+      if (structure.structureType === Game.STRUCTURE_EXTENSION) {
+        self.analyzeEnergyInformationAbout(structure, options);
+        self.analyzeExtensionInformationAbout(structure, options);
+      }
     });
     this.analyzis |= RoomAnalyzer.TYPE_EXTENSIONS;
   };
@@ -136,6 +139,10 @@ module.exports = (function () {
     } else {
       result.others.add(structure);
     }
+  };
+
+  RoomAnalyzer.prototype.analyzeExtensionInformationAbout = function analyzeExtensionInformationAbout(extension, options) {
+    this.result.extensions.count += 1;
   };
 
   RoomAnalyzer.prototype.analyzeCreepInformationAbout = function analyzeCreepInformationAbout(creep, options) {
