@@ -125,7 +125,6 @@ module.exports = (function () {
       this.memory.targetSource = (Game.getObjectById(this.memory.target) /* targetd worker */).memory.target/* worker's target */;
 
     }
-    this.memory.goTo = this.energy === this.energyCapacity ? 'storage' : 'worker';
 
     // find the nearest filled energy storage to the target or me
     // and transferEnergy from me
@@ -143,10 +142,10 @@ module.exports = (function () {
 
     if (!this.memory.nextTransporterId) {
       // find the nearest creep empty with goTo === 'worker'
-      if (this.memory.lastTransport !== 'builder' || nearestEnergyStorage && nearestEnergyStorage.energy < nearestEnergyStorage.energyCapacity) {
+      if (this.memory.lastTransport !== 'builder' || (!nearestEnergyStorage || nearestEnergyStorage.energy === nearestEnergyStorage.energyCapacity)) {
         nearestOne = transporterFindBuilder.call(this);
       }
-      if (!nearestOne) {
+      if (!nearestOne && this.memory.lastTransport !== 'transporter') {
         nearestOne = transporterFindTransporter.call(this);
       }
       if (nearestOne) {
@@ -165,14 +164,18 @@ module.exports = (function () {
 
         if (this.pos.inRangeTo(destinationObject.pos, 1)) {
           if (this.energy === this.energyCapacity) {
-            actionResult = this.transferEnergy(destinationObject);
-            if (this.energy === 0) {
-              this.memory.goTo = 'worker';
-              destinationObject.memory.goTo = 'storage';
+            if (this.energy > destinationObject.energyCapacity) {
+              actionResult = this.transferEnergy(destinationObject, destinationObject.energyCapacity);
+            } else {
+              actionResult = this.transferEnergy(destinationObject);
+              if (actionResult === Game.OK) {
+                this.memory.goTo = 'worker';
+              }
+              if (destinationObject.memory.type === CreepFactory.TRANSPORTER.type) destinationObject.memory.goTo  = 'storage';
             }
           } else {
             actionResult = destinationObject.transferEnergy(this);
-            if (this.energy === this.energyCapacity) {
+            if (actionResult === Game.OK) {
               this.memory.goTo = 'storage';
               destinationObject.memory.goTo = 'worker';
             }
@@ -180,7 +183,7 @@ module.exports = (function () {
           if (actionResult !== Game.OK) {
             console.log('errTransferingToCreep(' + this.name + ' to ' + destinationObject.name + ', ' + Exceptions[actionResult].errMessage + ')');
           }
-          destinationObject.memory.nextTransporterId = this.memory.nextTransporterId = destinationObject.memory.nextDirection = this.memory.nextDirection = null;
+          this.memory.nextTransporterId = destinationObject.memory.nextTransporterId = destinationObject.memory.nextDirection = this.memory.nextDirection = null;
         } else if (this.fatigue === 0) {
           this.moveTo(destinationObject.pos);
         }
@@ -194,7 +197,7 @@ module.exports = (function () {
       destinationObject = Game.getObjectById(this.memory.nextEnergyStorageId);
       if (this.pos.inRangeTo(destinationObject.pos, 1)) {
         actionResult = this.transferEnergy(destinationObject, this.energy);
-        if (this.energy === 0) {
+        if (actionResult === Game.OK) {
           this.memory.goTo = 'worker';
           this.memory.nextTransporterId = this.memory.nextDirection = null;
         }
@@ -206,7 +209,7 @@ module.exports = (function () {
     if (this.target) {
       if (this.pos.inRangeTo(this.target.pos, 1)) {
         actionResult = this.target.transferEnergy(this);
-        if (this.energy === this.energyCapacity) {
+        if (actionResult === Game.OK) {
           this.memory.goTo = 'storage';
           this.memory.nextEnergyStorageId = this.memory.nextTransporterId = this.memory.nextDirection = null;
         }
