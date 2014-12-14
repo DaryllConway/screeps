@@ -90,12 +90,14 @@ module.exports = (function () {
   function transporterFindBuilder() {
     return CreepFactory.BUILDER.getChildrenInRoom(this.room)
       .filter(function (creep) {
-        return creep.energy === 0 && creep.memory.target
-          && !creep.memory.nextTransporterId;
-      }).first();
+        return creep.memory.target
+          && !creep.memory.nextTransporterId
+          && this.pos.inRangeTo(creep.pos, 15);
+      }, this).findNearest(this.pos);
   }
 
   function transporterFindTransporter() {
+    if (!this.memory.nextEnergyStorageId) return null;
     var myDistanceToEnergyStorage = findPathTo(this.pos, Game.getObjectById(this.memory.nextEnergyStorageId).pos).length;
     return CreepFactory.TRANSPORTER.getChildrenInRoom(this.room)
       .filter(function (creep) {

@@ -13,8 +13,8 @@ var defaultMemory = {
       'bodyparts': ['move', 'carry', 'work', 'work', 'work']
     },
     'builder': {
-      'maxCount': 5, // per room
-      'bodyparts': ['move', 'move', 'carry', 'work', 'work']
+      'maxCount': 4, // per room
+      'bodyparts': ['move', 'carry', 'carry', 'work', 'work']
     },
     'transporter': {
       'maxCount': 2, // per room per worker
