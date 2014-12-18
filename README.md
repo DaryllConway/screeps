@@ -42,6 +42,8 @@ var analyzer = RoomAnalyzer.getRoom(creep.room)
 var result = analyzer.analyze(RoomAnalyzer.TYPE_STRUCTURES | RoomAnalyzer.TYPE_CONSTRUCTION_SITES | RoomAnalyzer.TYPE_CREEPS);
 ```
 
+The result of the room analysis is keep in cache, so you can call the method analyze several times with one of these type, and no more cpu times will be taken to this operation.
+
 ## TODO
 
 - define max bodyparts dynamically

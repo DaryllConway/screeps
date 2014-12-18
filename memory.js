@@ -10,15 +10,15 @@ var defaultMemory = {
   'blueprints': {
     'worker' : {
       'maxCount': 2, // per room per energySources
-      'bodyparts': ['move', 'carry', 'work', 'work', 'work']
-    },
-    'builder': {
-      'maxCount': 4, // per room
-      'bodyparts': ['move', 'carry', 'carry', 'work', 'work']
+      'bodyparts': 'move carry work work work carry carry work carry carry work carry carry work carry carry work carry carry'.split(' ')
     },
     'transporter': {
       'maxCount': 2, // per room per worker
-      'bodyparts': ['move', 'move', 'move', 'carry', 'carry']
+      'bodyparts': 'move move move carry carry move carry move carry move carry move carry move carry move carry move carry'.split(' ')
+    },
+    'builder': {
+      'maxCount': 4, // per room
+      'bodyparts': 'move carry work work carry move move carry carry work work carry carry work work carry carry work work'.split(' ')
     },
     'scout'  : {
       'maxCount': 0,

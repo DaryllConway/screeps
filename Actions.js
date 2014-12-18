@@ -58,6 +58,7 @@ module.exports = (function () {
   }
 
   function findPathTo(from, to) {
+    // TODO: check the ignore and avoid param
     var path = from.findPathTo(to, { maxOps: 200 });
     if (!path.length || !to.equalsTo(path[path.length - 1])) {
       path = from.findPathTo(to, { maxOps: 1000 });
@@ -96,20 +97,21 @@ module.exports = (function () {
       .filter(function (creep) {
         return creep.memory.target && !creep.memory.nextTransporterId
           && (range === 0 || this.pos.inRangeTo(creep.pos, range));
-      }, this).findNearest(this.pos);
+      }, this).findClosest(this.pos);
   }
 
   function transporterFindTransporter() {
     if (!this.memory.nextEnergyStorageId) return null;
-    var myDistanceToEnergyStorage = findPathTo(this.pos, Game.getObjectById(this.memory.nextEnergyStorageId).pos).length;
+    var myStorageId = this.memory.nextEnergyStorageId;
+    var myDistanceToEnergyStorage = findPathTo(this.pos, Game.getObjectById(myStorageId).pos).length;
     if (myDistanceToEnergyStorage < 3) return null;
     return CreepFactory.TRANSPORTER.getChildrenInRoom(this.room)
       .filter(function (creep) {
         if (!creep.memory.nextEnergyStorageId) return;
-        var creepDistanceToEnergyStorage = findPathTo(creep.pos, Game.getObjectById(creep.memory.nextEnergyStorageId).pos).length;
+        var creepDistanceToEnergyStorage = findPathTo(creep.pos, Game.getObjectById(myStorageId).pos).length;
         return this !== creep
           && this.memory.targetSource === creep.memory.targetSource /* same targeted worker's source */
-          && this.memory.goTo !== creep.memory.goTo
+          && creep.memory.goTo === 'worker'
           && !creep.memory.nextTransporterId
           && creepDistanceToEnergyStorage !== 0 && myDistanceToEnergyStorage !== 0
           && (
@@ -132,20 +134,19 @@ module.exports = (function () {
 
     }
 
-    //nearestEnergyStorage = Game.getObjectById(this.memory.)
     // find the nearest filled energy storage to the target or me
     analyzer = RoomAnalyzer.getRoom(this.room.name);
     energyStorageAnalyze = analyzer.analyze(RoomAnalyzer.TYPE_ENERGY_STORAGES).energyStorages;
 
     if (energyStorages = getFirstFilledCollection(energyStorageAnalyze.empty, energyStorageAnalyze.nearEmpty, energyStorageAnalyze.others)) {
-      nearestEnergyStorage = energyStorages.findNearest(this.target ? this.target.pos : this.pos);
+      nearestEnergyStorage = energyStorages.findClosest(this.target ? this.target.pos : this.pos);
     }
     if (nearestEnergyStorage) {
       this.memory.nextEnergyStorageId = nearestEnergyStorage.id;
     }
 
 
-    if (!this.memory.nextTransporterId) {
+    if (!this.memory.nextTransporterId && this.energy === this.energyCapacity) {
       // find the nearest creep empty with goTo === 'worker'
       if (this.memory.lastTransport !== 'builder' || (!nearestEnergyStorage || nearestEnergyStorage.energy === nearestEnergyStorage.energyCapacity)) {
         nearestOne = transporterFindBuilder.call(this, (!nearestEnergyStorage || nearestEnergyStorage.energy === nearestEnergyStorage.energyCapacity) ? 0 : 15);
@@ -157,6 +158,7 @@ module.exports = (function () {
         // console.log('assign ' + this.name + '(' + this.energy + '/' + this.energyCapacity +' )' + ' with ' + nearestOne.name + '(' + nearestOne.energy + '/' + nearestOne.energyCapacity +')')
         this.memory.nextTransporterId = nearestOne.id;
         nearestOne.memory.nextTransporterId = this.id;
+        nearestOne.memory.nextEnergyStorageId = this.memory.nextEnergyStorageId;
         this.memory.nextDirection = nearestOne.memory.nextDirection = null;
       }
     }

@@ -96,26 +96,12 @@ module.exports = (function () {
     return this.children[this.children.length - 1] || null;
   };
 
-  Collection.prototype.findNearest = function findNearest(pos, options) {
-    var
-      nearestIndex = -1, nearestCount = Number.MAX_VALUE,
-      index = -1, path;
-    if (this.children.length < 2) {
-      return this.children[0] || null;
-    }
-    options = options || {};
-    options.maxOps = options.maxOps || 1000;
-    while (++index < this.children.length) {
-      if (this.children[index] && (path = this.children[index].pos.findPathTo(pos, options)).length < nearestCount && path.length) {
-        nearestCount = path.length;
-        nearestIndex = index;
-      }
-    }
-    return this.children[nearestIndex] || null;
+  Collection.prototype.findClosest = function findClosest(pos, options) {
+    return pos.findClosest(this.toArray(), options);
   };
 
-  Collection.prototype.toString = function toString() {
-    return this.constructor.name + '[size: ' + this.children.length + ']';
+  Collection.prototype.findInRange = function findClosest(pos, range, options) {
+    return pos.findInRange(this.toArray(), range, options);
   };
 
   Collection.prototype.sort = function sort(comparator) {
@@ -134,12 +120,22 @@ module.exports = (function () {
   };
 
   Collection.prototype.merge = function merge(other) {
-    return new this.constructor(this.children.slice(0).concat(other instanceof Collection ? other.children : other));
+    return new this.constructor(this.toArray().concat(other instanceof Collection ? other.children : other));
   };
 
   Collection.prototype.clone = function clone() {
-    return new this.constructor(this.children.slice(0));
+    return new this.constructor(this.toArray());
   };
+
+  Collection.prototype.toArray = function toArray() {
+    return this.children.slice();
+  };
+
+  Collection.prototype.toString = function toString() {
+    return this.constructor.name + '[size: ' + this.children.length + ']';
+  };
+
+
 
   return Collection;
 })();

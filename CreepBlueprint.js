@@ -5,25 +5,46 @@ module.exports = (function () {
   var utils = require('utils');
   var Exceptions = require('Exceptions');
   var Storage = require('StorageElement');
+  var RoomAnalyzer = require('RoomAnalyzer');
 
   function CreepBlueprint(name) {
     this.name = name;
     this.type = name.toLowerCase();
     this.storage = Storage.get('blueprints.' + this.type);
-    this.bodies = this.storage.get('bodyparts');
-    this.cost = utils.sumBodyParts(this.bodies);
+    this.bodyparts = this.storage.get('bodyparts');
     this.rooms = {};
   }
 
   CreepBlueprint.prototype.create = function create(spawn) {
     var
       nextName = this.getNextName(),
-      creepName = (spawn || utils.getDefaultSpawn()).createCreep(this.bodies, nextName, { type: this.type });
-    if (typeof creepName === 'number') {
-      console.log('errSpawnCreep(' + String(nextName) + ', ' + Exceptions[creepName].errMessage + ')');
-      return null;
+      creepName,
+      energyStorages = RoomAnalyzer.getRoom(spawn.room).analyze(RoomAnalyzer.TYPE_ENERGY_STORAGES).energyStorages,
+      body = [];
+    spawn = spawn || utils.getDefaultSpawn();
+    if (energyStorages.extensionsTotalEnergyCapacity === 0 || energyStorages.extensionsTotalEnergy > energyStorages.extensionsTotalEnergyCapacity * 0.5) {
+      if (body = this.getAllowedBodyParts(spawn)) {
+        console.log('try to spawn ' + this.type + '["' + body.join('", "') + '"], size: ' + body.length);
+        creepName = spawn.createCreep(body, nextName, { type: this.type });
+        if (typeof creepName === 'number') {
+          console.log('errSpawnCreep(' + String(nextName) + ', ' + Exceptions[creepName].errMessage + ')');
+          return null;
+        }
+      }
     }
     return Game.creeps[creepName];
+  };
+
+  CreepBlueprint.prototype.getAllowedBodyParts = function getAllowedBodyParts(spawn) {
+    var analysis = RoomAnalyzer.getRoom(spawn.room).analyze(RoomAnalyzer.TYPE_EXTENSIONS | RoomAnalyzer.TYPE_ENERGY_STORAGES);
+    var extensionsCount = analysis.extensions.count;
+    var maxEnergyToSpend = Math.min(analysis.energyStorages.extensionsTotalEnergy, analysis.energyStorages.extensionsTotalEnergyCapacity / 4);
+    var extendedBodyParts = this.bodyparts.slice(5, extensionsCount);
+    while (utils.sumBodyParts(extendedBodyParts) > maxEnergyToSpend) {
+      extendedBodyParts.pop();
+    }
+
+    return this.bodyparts.slice(0, 5 + extendedBodyParts.length);
   };
 
   CreepBlueprint.prototype.getNextName = function getNextName() {

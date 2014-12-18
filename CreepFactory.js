@@ -10,16 +10,21 @@ module.exports = (function () {
     this.WORKER  = new CreepBlueprint('Worker');
     this.BUILDER = new CreepBlueprint('Builder');
     this.TRANSPORTER = new CreepBlueprint('Transporter');
+    this.CLEANER = new CreepBlueprint('Cleaner');
     // this.SCOUT   = new CreepBlueprint('Scout');
     this.methods = this.keys.map((function (type) {
       return this['spawn' + String(type.charAt(0).toUpperCase() + type.substr(1, type.length).toLowerCase()) + 'Into'];
     }).bind(this));
   }
 
+  CreepFactory.prototype.spawnCleanerInto = function spawnCleanerInto(spawn) {
+
+  };
+
   CreepFactory.prototype.spawnWorkerInto = function spawnWorkerInto(spawn) {
-    var analysis = RoomAnalyzer.getRoom(spawn.room).analyze(RoomAnalyzer.TYPE_SPAWNS | RoomAnalyzer.TYPE_SOURCES | RoomAnalyzer.TYPE_EXTENSIONS);
+    var analysis = RoomAnalyzer.getRoom(spawn.room).analyze(RoomAnalyzer.TYPE_SOURCES | RoomAnalyzer.TYPE_EXTENSIONS);
     var maxCount = analysis.energySources.count;
-    if (analysis.extensions.count > 1) {
+    if (analysis.extensions.count > 2) {
       maxCount *= this.WORKER.getMaxCount();
     }
     if (this.WORKER.getChildrenInRoom(spawn.room).size() < maxCount) {
@@ -33,7 +38,7 @@ module.exports = (function () {
   CreepFactory.prototype.spawnTransporterInto = function spawnTransporterInto(spawn) {
     var analysis = RoomAnalyzer.getRoom(spawn.room).analyze(RoomAnalyzer.TYPE_EXTENSIONS);
     var maxCount = this.WORKER.getChildrenInRoom(spawn.room).size();
-    if (analysis.extensions.count > 1) {
+    if (analysis.extensions.count > 2) {
       maxCount *= this.TRANSPORTER.getMaxCount();
     }
     if (this.TRANSPORTER.getChildrenInRoom(spawn.room).size() < maxCount) {
