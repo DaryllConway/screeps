@@ -14,7 +14,7 @@ var defaultMemory = {
     },
     'transporter': {
       'maxCount': 2, // per room per worker
-      'bodyparts': 'move move move carry carry move carry move carry move carry move carry move carry move carry move carry'.split(' ')
+      'bodyparts': 'move move move move carry carry move carry move carry move carry move carry move carry move carry move'.split(' ')
     },
     'builder': {
       'maxCount': 4, // per room

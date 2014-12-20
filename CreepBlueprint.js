@@ -22,14 +22,13 @@ module.exports = (function () {
       energyStorages = RoomAnalyzer.getRoom(spawn.room).analyze(RoomAnalyzer.TYPE_ENERGY_STORAGES).energyStorages,
       body = [];
     spawn = spawn || utils.getDefaultSpawn();
-    if (energyStorages.extensionsTotalEnergyCapacity === 0 || energyStorages.extensionsTotalEnergy > energyStorages.extensionsTotalEnergyCapacity * 0.5) {
-      if (body = this.getAllowedBodyParts(spawn)) {
-        console.log('try to spawn ' + this.type + '["' + body.join('", "') + '"], size: ' + body.length);
-        creepName = spawn.createCreep(body, nextName, { type: this.type });
-        if (typeof creepName === 'number') {
-          console.log('errSpawnCreep(' + String(nextName) + ', ' + Exceptions[creepName].errMessage + ')');
-          return null;
-        }
+
+    if (body = this.getAllowedBodyParts(spawn)) {
+      console.log('try to spawn ' + this.type + '["' + body.join('", "') + '"], size: ' + body.length);
+      creepName = spawn.createCreep(body, nextName, { type: this.type });
+      if (typeof creepName === 'number') {
+        console.log('errSpawnCreep(' + String(nextName) + ', ' + Exceptions[creepName].errMessage + ')');
+        return null;
       }
     }
     return Game.creeps[creepName];
@@ -43,7 +42,7 @@ module.exports = (function () {
     while (utils.sumBodyParts(extendedBodyParts) > maxEnergyToSpend) {
       extendedBodyParts.pop();
     }
-
+    // if (energyStorages.extensionsTotalEnergyCapacity === 0 || energyStorages.extensionsTotalEnergy > energyStorages.extensionsTotalEnergyCapacity * 0.5)
     return this.bodyparts.slice(0, 5 + extendedBodyParts.length);
   };
 

@@ -12,11 +12,10 @@
     Object.keys(defaultMemory).forEach(function (key) {
       Memory[key] = defaultMemory[key];
     });
+    Memory.isRunning = !!Object.keys(Game.spawns || {}).length;
   }
 
-  if (Memory.isRunning === false) {
-    return;
-  }
+  if (Memory.isRunning === false) return;
 
   try {
 

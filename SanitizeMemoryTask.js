@@ -41,10 +41,8 @@ module.exports = (function () {
         }
       });
 
-      K.workers.forEach(function (worker) {
-        if (!transporterStorage.get(worker.id)) {
-          transporterStorage.set(worker.id, []);
-        }
+      Object.keys(Memory.assignations.worker || {}).forEach(function (sourceId) {
+        if (!transporterStorage.get(sourceId)) transporterStorage.set(sourceId, []);
       });
     });
 

@@ -46,7 +46,7 @@ The result of the room analysis is keep in cache, so you can call the method ana
 
 ## TODO
 
-- define max bodyparts dynamically
+- create Formation with rotate method
 - guard behavior
 - road referencing
 
