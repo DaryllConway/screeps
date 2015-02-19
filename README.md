@@ -16,7 +16,7 @@ A Task is a code that will be run on every n tick.
 var Task = require('Task');
 
 function MyTask() {
-  MyTask.__super__.constructor.call(this, 'set a unique id here', 4)
+  MyTask.__super__.constructor.call(this, 'set a unique id here', 4);
   // this task will be run every 4 ticks
 }
 
@@ -40,7 +40,7 @@ The structure of result of the analysis is in dataDefaultRoomAnalyzerResult.js
 You can pass several types with the byte operator '|'
 
 ```javascript
-var analyzer = RoomAnalyzer.getRoom(creep.room)
+var analyzer = RoomAnalyzer.getRoom(creep.room);
 var result = analyzer.analyze(RoomAnalyzer.TYPE_STRUCTURES | RoomAnalyzer.TYPE_CONSTRUCTION_SITES | RoomAnalyzer.TYPE_CREEPS);
 ```
 

@@ -1,0 +1,1 @@
+find . -type f | egrep "\.(js)$" | xargs wc -l
