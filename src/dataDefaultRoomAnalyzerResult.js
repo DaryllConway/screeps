@@ -3,7 +3,7 @@ module.exports = (function () {
 
   var
     Collection = require('Collection'),
-    CreepCollection = require('CreepCollection');
+    CreepCollection = require('creep/CreepCollection');
 
   return function () {
     return {

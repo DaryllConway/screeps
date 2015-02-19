@@ -3,7 +3,7 @@ module.exports = (function () {
 
   var Task = require('Task');
   var utils = require('utils');
-  var Look = require('Look');
+  var Look = require('buildings/Look');
 
   function BuildRoadTask() {
     BuildRoadTask.__super__.constructor.call(this, 'buildRoad', 20);

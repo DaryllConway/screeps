@@ -2,11 +2,11 @@ module.exports = (function () {
   'use strict';
 
   var Actions = {};
-  var RoomAnalyzer = require('RoomAnalyzer');
-  var Storage = require('StorageElement');
+  var RoomAnalyzer = require('analyzers/RoomAnalyzer');
+  var Storage = require('Storage');
   var Exceptions = require('Exceptions');
-  var CreepCollection =  require('CreepCollection');
-  var CreepFactory = require('CreepFactory');
+  var CreepCollection =  require('creep/CreepCollection');
+  var CreepFactory = require('creep/CreepFactory');
 
   function getFirstFilledCollection(/* collection1, collection2, collection2, ... */) {
     for (var index in arguments) {

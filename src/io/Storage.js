@@ -4,14 +4,14 @@ module.exports = (function () {
   var utils = require('utils');
   var root;
 
-  function StorageElement(key, object) {
+  function Storage(key, object) {
     this.object = object;
     this.key = key;
   }
 
-  StorageElement.prototype.constructor = StorageElement;
+  Storage.prototype.constructor = Storage;
 
-  StorageElement.prototype.get = function get(key) {
+  Storage.prototype.get = function get(key) {
     var keys = key.split('.');
     var value = this.object;
     var index = -1;
@@ -25,7 +25,7 @@ module.exports = (function () {
     return utils.isLitteralObject(value) ? new (this.constructor)(keys[index - 1], value) : value;
   };
 
-  StorageElement.prototype.set = function set(key, newvalue) {
+  Storage.prototype.set = function set(key, newvalue) {
     var keys = key.split('.');
     var value = this.object, parentvalue;
     var index = -1;
@@ -40,7 +40,7 @@ module.exports = (function () {
     return utils.isLitteralObject(value) ? new (this.constructor)(keys[index - 1], value) : parentvalue[keys[index - 1]];
   };
 
-  StorageElement.prototype.destroy = function destroy(key) {
+  Storage.prototype.destroy = function destroy(key) {
     var keys = key.split('.');
     var value = this.object, parentvalue;
     var index = -1;
@@ -54,16 +54,16 @@ module.exports = (function () {
     delete parentvalue[keys[index - 1]];
   };
 
-  StorageElement.prototype.values = function values() {
+  Storage.prototype.values = function values() {
     var memoryObject = this.object;
     return this.keys().map(function (key) { return memoryObject[key]; });
   };
 
-  StorageElement.prototype.keys = function keys() {
+  Storage.prototype.keys = function keys() {
     return Object.keys(this.object);
   };
 
-  StorageElement.prototype.contains = function containsKey(key) {
+  Storage.prototype.contains = function containsKey(key) {
     var keys = key.split('.'), value = this.object;
     var index = -1;
     while (++index < keys.length) {
@@ -76,7 +76,7 @@ module.exports = (function () {
     return !!value || value === false || value === 0;
   };
 
-  StorageElement.prototype.incr = function incr(key, step) {
+  Storage.prototype.incr = function incr(key, step) {
     var keys = key.split('.');
     var value = this.object, parentvalue;
     var index = -1, lastDefaultValueIndex;
@@ -93,7 +93,7 @@ module.exports = (function () {
     return parentvalue[keys[index - 1]];
   };
 
-  StorageElement.prototype.findInArray = function findInArray(key, item) {
+  Storage.prototype.findInArray = function findInArray(key, item) {
     var keys = key.split('.');
     var value = this.object, parentvalue;
     var index = -1, lastDefaultValueIndex;
@@ -110,23 +110,23 @@ module.exports = (function () {
     return -1;
   };
 
-  StorageElement.prototype.decr = function decr(key, step) {
+  Storage.prototype.decr = function decr(key, step) {
     return this.incr(key, -(step || 1));
   };
 
-  StorageElement.prototype.getRoot = function getRoot() {
+  Storage.prototype.getRoot = function getRoot() {
     return root;
   };
 
-  StorageElement.prototype.isRoot = function isRoot() {
+  Storage.prototype.isRoot = function isRoot() {
     return this.object === Memory;
   };
 
-  StorageElement.prototype.toString = function toString() {
-    return 'StorageElement[' + this.key + ']';
+  Storage.prototype.toString = function toString() {
+    return 'Storage[' + this.key + ']';
   };
 
-  root = new StorageElement('Memory', Memory);
+  root = new Storage('Memory', Memory);
 
   return root;
 

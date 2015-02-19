@@ -1,9 +1,9 @@
 module.exports = (function () {
   'use strict';
 
-  var CreepBlueprint = require('CreepBlueprint');
+  var CreepBlueprint = require('creep/CreepBlueprint');
   var K = require('K');
-  var RoomAnalyzer = require('RoomAnalyzer');
+  var RoomAnalyzer = require('analyzers/RoomAnalyzer');
 
   function CreepFactory() {
     this.keys = ['WORKER', 'BUILDER', 'TRANSPORTER'];

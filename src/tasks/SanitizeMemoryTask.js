@@ -3,8 +3,8 @@ module.exports = (function () {
 
   var Task = require('Task');
   var K = require('K');
-  var Storage = require('StorageElement');
-  var RoomAnalyzer = require('RoomAnalyzer');
+  var Storage = require('Storage');
+  var RoomAnalyzer = require('analyzers/RoomAnalyzer');
 
   function SanitizeMemoryTask() {
     SanitizeMemoryTask.__super__.constructor.call(this, 'memorySanitizer', 0);

@@ -22,11 +22,11 @@
     K = require('K');
 
     TaskManager = require('TaskManager');
-    SanitizeMemoryTask = require('SanitizeMemoryTask');
-    SetupGlobalObjectTask = require('SetupGlobalObjectTask');
+    SanitizeMemoryTask = require('tasks/SanitizeMemoryTask');
+    SetupGlobalObjectTask = require('tasks/SetupGlobalObjectTask');
     // BuildRoadTask = require('BuildRoadTask');
-    SpawnCreepTask = require('SpawnCreepTask');
-    RoomAnalyzer = require('RoomAnalyzer');
+    SpawnCreepTask = require('tasks/SpawnCreepTask');
+    RoomAnalyzer = require('analyzers/RoomAnalyzer');
 
     tasks = new TaskManager();
     tasks.add(new SetupGlobalObjectTask());

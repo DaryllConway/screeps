@@ -1,11 +1,11 @@
 module.exports = (function () {
   'use strict';
 
-  var CreepCollection = require('CreepCollection');
+  var CreepCollection = require('creep/CreepCollection');
   var utils = require('utils');
   var Exceptions = require('Exceptions');
-  var Storage = require('StorageElement');
-  var RoomAnalyzer = require('RoomAnalyzer');
+  var Storage = require('Storage');
+  var RoomAnalyzer = require('analyzers/RoomAnalyzer');
 
   function CreepBlueprint(name) {
     this.name = name;

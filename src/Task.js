@@ -1,7 +1,7 @@
 module.exports = (function () {
   'use strict';
 
-  var Storage = require('StorageElement');
+  var Storage = require('Storage');
   var instancedTasks = [];
 
   function Task(id, delta) {

@@ -3,10 +3,10 @@ module.exports = (function () {
 
   var Task = require('Task');
   var Collection = require('Collection');
-  var CreepCollection = require('CreepCollection');
-  var Actions = require('Actions');
+  var CreepCollection = require('creep/CreepCollection');
+  var Actions = require('behaviors/Actions');
   var K = require('K');
-  var CreepFactory = require('CreepFactory');
+  var CreepFactory = require('creep/CreepFactory');
 
   function SetupGlobalObjectTask() {
     SetupGlobalObjectTask.__super__.constructor.call(this, 'setupGlobalObject', 0);
