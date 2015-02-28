@@ -1,0 +1,27 @@
+{
+  "name": "k-screeps",
+  "version": "0.0.1",
+  "description": "This library is under construction and add many concepts to help maintain and improve the code readability as Collection, Storage, Tasks, ... You can clone my code, i don't care. This is just to make an experience the IA structure and whether it is appropriate to use OOP with the prototype structure instead of OOP with only functions with a procedural structure.",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kelgors/screeps.git"
+  },
+  "keywords": [
+    "screeps",
+    "kelgors"
+  ],
+  "author": "Kelgors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Kelgors/screeps/issues"
+  },
+  "homepage": "https://github.com/Kelgors/screeps",
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-flatten": "0.0.4"
+  }
+}

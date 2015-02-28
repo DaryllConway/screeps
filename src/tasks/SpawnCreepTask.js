@@ -2,7 +2,7 @@ module.exports = (function () {
   'use strict';
 
   var Task = require('Task');
-  var CreepFactory = require('creep/CreepFactory');
+  var CreepFactory = require('CreepFactory');
 
   function SpawnCreepTask() {
     SpawnCreepTask.__super__.constructor.call(this, 'spawnCreep', 13);

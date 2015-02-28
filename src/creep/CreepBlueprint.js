@@ -1,11 +1,11 @@
 module.exports = (function () {
   'use strict';
 
-  var CreepCollection = require('creep/CreepCollection');
+  var CreepCollection = require('CreepCollection');
   var utils = require('utils');
   var Exceptions = require('Exceptions');
   var Storage = require('Storage');
-  var RoomAnalyzer = require('analyzers/RoomAnalyzer');
+  var RoomAnalyzer = require('RoomAnalyzer');
 
   function CreepBlueprint(name) {
     this.name = name;
@@ -26,7 +26,7 @@ module.exports = (function () {
       creepName = spawn.createCreep(body, nextName, { type: this.type });
       if (typeof creepName === 'number') {
         // creepName is an error code
-        console.log('errSpawnCreep(' + String(nextName) + ', ' + Exceptions[creepName].errMessage + ')');
+        console.log('errSpawnCreep(' + String(nextName) + ', ' + Exceptions[creepName] + ')');
         return null;
       }
     }

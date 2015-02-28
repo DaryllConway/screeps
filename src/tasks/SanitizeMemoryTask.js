@@ -4,7 +4,7 @@ module.exports = (function () {
   var Task = require('Task');
   var K = require('K');
   var Storage = require('Storage');
-  var RoomAnalyzer = require('analyzers/RoomAnalyzer');
+  var RoomAnalyzer = require('RoomAnalyzer');
 
   function SanitizeMemoryTask() {
     SanitizeMemoryTask.__super__.constructor.call(this, 'memorySanitizer', 0);

@@ -2,11 +2,11 @@ module.exports = (function () {
   'use strict';
 
   var Actions = {};
-  var RoomAnalyzer = require('analyzers/RoomAnalyzer');
+  var RoomAnalyzer = require('RoomAnalyzer');
   var Storage = require('Storage');
   var Exceptions = require('Exceptions');
-  var CreepCollection =  require('creep/CreepCollection');
-  var CreepFactory = require('creep/CreepFactory');
+  var CreepCollection =  require('CreepCollection');
+  var CreepFactory = require('CreepFactory');
 
   function getFirstFilledCollection(/* collection1, collection2, collection2, ... */) {
     for (var index in arguments) {
@@ -80,7 +80,7 @@ module.exports = (function () {
       if (actionResult === Game.OK) {
         this.memory.nextDirection.shift();
       } else {
-        console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult].errMessage + ')');
+        console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult] + ')');
       }
     }
     if (!this.memory.nextDirection.length) {
