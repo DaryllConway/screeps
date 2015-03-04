@@ -47,8 +47,19 @@ var result = analyzer.analyze(RoomAnalyzer.TYPE_STRUCTURES | RoomAnalyzer.TYPE_C
 
 ## TODO
 
-- create creep Formation with rotate method
-- guard behavior
-- road referencing (indexing road position between spawns and sources if spawn already exists)
+1. Game.getRoom deprecated, use Game.rooms
+2. cpuLimit & getUsedCpu support
+3. Method move into behavior: Creep.moveTo() method now reuses the path found along multiple game ticks without recalculation in order to save CPU time. See option reusePath for more info
+4. Creep.say() to specify current action/target/coworker
+Construction priority
+5. Keep in memory instance states if possible
+6. rewrite actions.js
+7. Comment more existing code
+8. Memory.rooms[room.name] is Room.memory, something to do with RoomAnalyzer and maxCount of creeps per room, debugMode
+
+10. find usage of Room.mode (Game.MODE_SIMULATION|Game.MODE_SURVIVAL|Game.MODE_WORLD)
+11. create creep Formation with rotate method
+12. guard behavior (lookForAt, lookForAtArea could be good to watch what is going on in creep area)
+30. road referencing (indexing road position between spawns and sources if spawn already exists)
 
 
