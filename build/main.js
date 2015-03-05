@@ -13,7 +13,7 @@
       Memory[key] = defaultMemory[key];
     });
     Memory.isRunning = !!Object.keys(Game.spawns || {}).length;
-    if (Room.mode === Game.MODE_SIMULATION) {
+    if (Game.rooms['1-1'] && Game.rooms['1-1'].mode === Game.MODE_SIMULATION) {
       console.log("Please create a spawn and some sources");
     }
 
