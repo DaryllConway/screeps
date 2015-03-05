@@ -3,7 +3,7 @@ module.exports = (function () {
 
   function RoomAnalyzer(roomName, options) {
     this.roomName = roomName;
-    this.room = Game.getRoom(roomName);
+    this.room = Game.rooms[roomName];
     this.analyzis = 0;
     this.result = this.createDefaultResult();
     this.options = options || this.getDefaultOptions();
@@ -30,10 +30,22 @@ module.exports = (function () {
     };
   };
 
+  /**
+   * Check if an analyze can be run on one type
+   * @param {number} type give a RoomAnalyzer.TYPE_... (support byte operators)
+   * @param {number} analyzeType the RoomAnalyzer.TYPE_ to check
+   * @returns {boolean}
+  **/
   RoomAnalyzer.prototype.canRunAnalyzeOn = function canRunAnalyzeOn(type, analyzeType) {
     return (type === 0 || !!(type & analyzeType)) && !(this.analyzis & analyzeType);
   };
 
+  /**
+   * Run one or more analysis with the given type
+   * @param {number} type give a RoomAnalyzer.TYPE_... (support byte operators)
+   * @param {object.<?>} options default options available with RoomAnalyzer.prototype.getDefaultOptions
+   * @returns {object.<?>} the result object with all analasis done before and now
+  **/
   RoomAnalyzer.prototype.analyze = function analyze(type, options) {
     if (this.canRunAnalyzeOn(type, RoomAnalyzer.TYPE_SPAWNS)) {
       this.analyzeSpawns(options);
@@ -59,7 +71,12 @@ module.exports = (function () {
     return this.result;
   };
 
+  /**
+   * Invalidate one or more analysis
+   * @param {number} type give a RoomAnalyzer.TYPE_... (support byte operators)
+  **/
   RoomAnalyzer.prototype.invalidateAnalyze = function invalidateAnalyze(type) {
+    if (typeof type !== 'number' && type < 0) throw new Error('You must give one RoomAnalyzer type in first argument');
     type === 0 ? this.analyzis = 0 : this.analyzis ^= type;
   };
 

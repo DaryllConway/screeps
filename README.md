@@ -47,19 +47,26 @@ var result = analyzer.analyze(RoomAnalyzer.TYPE_STRUCTURES | RoomAnalyzer.TYPE_C
 
 ## TODO
 
-1. Game.getRoom deprecated, use Game.rooms
-2. cpuLimit & getUsedCpu support
-3. Method move into behavior: Creep.moveTo() method now reuses the path found along multiple game ticks without recalculation in order to save CPU time. See option reusePath for more info
-4. Creep.say() to specify current action/target/coworker
-Construction priority
-5. Keep in memory instance states if possible
-6. rewrite actions.js
-7. Comment more existing code
-8. Memory.rooms[room.name] is Room.memory, something to do with RoomAnalyzer and maxCount of creeps per room, debugMode
+<ol>
+  <li>Make it work. Log a reminder in Game.MODE_SIMULATION to create Spawn1 and some sources.</li>
+  <li>Game.getRoom() deprecated, use Game.rooms</li>
+  <li>Method move into behavior: Creep.moveTo() method now reuses the path found along multiple game ticks without recalculation in order to save CPU time. See option reusePath for more info</li>
+  <li>Creep.say() to specify current action/target/coworker. see inverseState, cancelTransport</li>
+  <li>Create a changeNextTransporterId, changeNextBlahBlah</li>
+  <li>Keep in memory instance states if possible</li>
+  <li>rewrite actions.js, maybe one method by file</li>
+  <li>Comment more existing code</li>
+  <li>Memory.rooms[room.name] is Room.memory, something to do with RoomAnalyzer and maxCount of creeps per room, debugMode</li>
+  <li>Create a method or object, that say easily if the support units are stucked or not. Do something to avoid that in an ideal way.</li>
+  <li>find usage of Room.mode (Game.MODE_SIMULATION|Game.MODE_SURVIVAL|Game.MODE_WORLD)</li>
+  <li>create creep Formation with rotate method</li>
+  <li>guard behavior (lookForAt, lookForAtArea could be good to watch what is going on in creep area)</li>
+  <li>cpuLimit & getUsedCpu support</li>
+  <li>Construction priority</li>
+  <li>road referencing (indexing road position between spawns and sources if spawn already exists)</li>
+</ol>
 
-10. find usage of Room.mode (Game.MODE_SIMULATION|Game.MODE_SURVIVAL|Game.MODE_WORLD)
-11. create creep Formation with rotate method
-12. guard behavior (lookForAt, lookForAtArea could be good to watch what is going on in creep area)
-30. road referencing (indexing road position between spawns and sources if spawn already exists)
+## Ideas
 
-
+- Make something to extend instance with mixins
+- Something to do with RangeAnalyzer and lookForAt, lookForAtArea methods
