@@ -8,6 +8,10 @@ module.exports = (function () {
   var CreepCollection =  require('CreepCollection');
   var CreepFactory = require('CreepFactory');
 
+  var defaultMoveToOptions = {
+    reusePath: 4
+  };
+
   function getFirstFilledCollection(/* collection1, collection2, collection2, ... */) {
     for (var index in arguments) {
       if (arguments[index] && arguments[index].size()) return arguments[index];
@@ -18,7 +22,7 @@ module.exports = (function () {
     if (target) {
       Storage.get('assignations.' + type + '.' + target.id).push(creep.name);
       creep.memory.target = target.id;
-      creep.memory.nextDirection = null;
+      creep.memory._move = null;
     }
     creep.target = target;
   }
@@ -64,28 +68,6 @@ module.exports = (function () {
       path = from.findPathTo(to, { maxOps: 1000 });
     }
     return !path.length || !to.equalsTo(path[path.length - 1]) ? [] : path;
-  }
-
-  function moveTo(targetedPosition, toDo) {
-    var actionResult, nextDirection;
-    if (!this.memory.nextDirection || this.pos.inRangeTo(targetedPosition, 4)) {
-      // update nextDirection if the creep haven't any one
-      // or if it's next to the target
-      nextDirection = findPathTo(this.pos, targetedPosition).map(function (path) { return path.direction; });
-      if (!nextDirection.length) return;
-      this.memory.nextDirection = nextDirection;
-    }
-    if (this.fatigue === 0 && this.memory.nextDirection.length) {
-      actionResult = this.move(this.memory.nextDirection[0]);
-      if (actionResult === Game.OK) {
-        this.memory.nextDirection.shift();
-      } else {
-        console.log('errMoving(' + this.name + ', ' + Exceptions[actionResult] + ')');
-      }
-    }
-    if (!this.memory.nextDirection.length) {
-      this.memory.nextDirection = null;
-    }
   }
 
   function getMaxEnergyToTransfer(from, to) {
@@ -138,7 +120,7 @@ module.exports = (function () {
     return (memory.state = (memory.state === STATE_GOTO_WORKER ? STATE_GOTO_STORAGE : STATE_GOTO_WORKER));
   }
   function cancelTransport(transporter1, transporter2) {
-    transporter1.memory.nextDirection = transporter2.memory.nextDirection = transporter1.memory.nextTransporterId = transporter2.memory.nextTransporterId = null;
+    transporter1.memory._move = transporter2.memory._move = transporter1.memory.nextTransporterId = transporter2.memory.nextTransporterId = null;
   }
 
   /**
@@ -184,7 +166,7 @@ module.exports = (function () {
         nearestOne.memory.nextTransporterId = this.id;
         nearestOne.memory.nextEnergyStorageId = mem.nextEnergyStorageId;
         // reset their nextDirection cache
-        mem.nextDirection = nearestOne.memory.nextDirection = null;
+        mem._move = nearestOne.memory._move = null;
       }
     }
 
@@ -214,10 +196,10 @@ module.exports = (function () {
         if (actionResult === Game.OK || !this.energy) {
           inverseState(mem);
           mem.lastTransport = 'energyStorage';
-          mem.nextTransporterId = this.memory.nextDirection = null;
+          mem.nextTransporterId = this.memory._move = null;
         }
       } else {
-        moveTo.call(this, destinationObject.pos);
+        this.moveTo(this.target.pos, defaultMoveToOptions);
       }
       return;
     }
@@ -230,10 +212,10 @@ module.exports = (function () {
         }
         if (countTransfered > 0) {
           inverseState(mem);
-          mem.nextEnergyStorageId = mem.nextTransporterId = mem.nextDirection = null;
+          mem.nextEnergyStorageId = mem.nextTransporterId = mem._move = null;
         }
       } else {
-        moveTo.call(this, this.target.pos);
+        this.moveTo(this.target.pos, defaultMoveToOptions);
       }
     }
   };
@@ -256,7 +238,7 @@ module.exports = (function () {
       this.harvest(this.target);
       return;
     }
-    moveTo.call(this, this.target.pos);
+    this.moveTo(this.target.pos, defaultMoveToOptions);
   };
 
   Actions.build = function build() {
@@ -276,7 +258,7 @@ module.exports = (function () {
       if (this.energy > 0) this.build(this.target);
       return;
     }
-    moveTo.call(this, this.target.pos);
+    this.moveTo(this.target.pos, defaultMoveToOptions);
   };
 
   return Actions;

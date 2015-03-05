@@ -43,8 +43,8 @@ module.exports = (function () {
   };
 
   BuildRoadTask.prototype.buildRoadTo = function (from, to) {
-    var room = Game.getRoom(from.pos.roomName), isBuilding = false;
-    if (room !== Game.getRoom(to.pos.roomName)) {
+    var room = Game.rooms[from.pos.roomName], isBuilding = false;
+    if (room !== Game.rooms[to.pos.roomName)] {
       return false;
     }
     var path = from.pos.findPathTo(to, { ignoreCreeps: true, ignoreDestructibleStructures: true, maxOps: 200 });

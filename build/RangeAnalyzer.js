@@ -7,7 +7,7 @@ module.exports = (function () {
 
   RangeAnalyzer.prototype.constructor = RangeAnalyzer;
 
-  RangeAnalyzer.prototype.analyze = function() {
+  RangeAnalyzer.prototype.analyze = function () {
 
   };
 

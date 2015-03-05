@@ -13,6 +13,10 @@
       Memory[key] = defaultMemory[key];
     });
     Memory.isRunning = !!Object.keys(Game.spawns || {}).length;
+    if (Room.mode === Game.MODE_SIMULATION) {
+      console.log("Please create a spawn and some sources");
+    }
+
   }
 
   if (Memory.isRunning === false) return;
